@@ -2,7 +2,7 @@
 
 export function Skeleton({ className }: { className?: string }) {
   return (
-    <div className={cn("animate-pulse rounded-md bg-gray-100 dark:bg-gray-800", className)} />
+    <div className={cn("animate-pulse rounded-md bg-gray-100", className)} />
   )
 }
 
@@ -17,3 +17,4 @@ export function TableSkeleton({ rows = 8 }: { rows?: number }) {
     </div>
   )
 }
+

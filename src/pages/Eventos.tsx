@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -124,13 +124,13 @@ export function EventosPage() {
               <div key={mes}>
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 capitalize">{mes}</p>
                 <div className="space-y-2">
-                  {evs.map((ev: Evento) => {
+                  {evs.map((ev: Evento, idx: number) => {
                     const colorClass = TIPO_COLORS[ev.tipo ?? ""] ?? TIPO_COLORS.Otro
                     const fecha = parseISO(ev.fecha_inicio)
                     const esHoy = isToday(fecha)
                     return (
                       <button
-                        key={ev.id}
+                        key={ev.id ?? `ev-${idx}`}
                         onClick={() => setSelectedEvento(ev)}
                         className={`w-full flex items-center gap-4 p-4 bg-white border rounded-xl text-left hover:shadow-md transition-all ${esHoy ? "ring-2 ring-blue-400 border-blue-200" : "border-gray-200 hover:border-blue-200"}`}
                       >
@@ -213,7 +213,7 @@ export function EventosPage() {
                   {dayEvs.map(ev => {
                     const colorClass = TIPO_COLORS[ev.tipo ?? ""] ?? TIPO_COLORS.Otro
                     return (
-                      <button key={ev.id} onClick={() => setSelectedEvento(ev)}
+                      <button key={ev.id ?? `cal-${ev.titulo}`} onClick={() => setSelectedEvento(ev)}
                         className={`w-full text-left text-[10px] px-1.5 py-0.5 rounded font-medium mb-0.5 truncate border ${colorClass} hover:opacity-80 transition-opacity`}>
                         {ev.titulo}
                       </button>
@@ -347,3 +347,4 @@ export function EventosPage() {
     </div>
   )
 }
+

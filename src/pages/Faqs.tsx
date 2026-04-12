@@ -79,7 +79,7 @@ function FaqCard({ faq }: { faq: Faq }) {
                 : <><CheckCircle size={13} className="text-emerald-500" />Activar</>}
             </button>
             <button
-              onClick={() => faq.id && deleteFaq.mutate(faq.id)}
+              onClick={() => { if (faq.id && window.confirm("¿Eliminar esta FAQ? Esta acción no se puede deshacer.")) deleteFaq.mutate(faq.id) }}
               disabled={deleteFaq.isPending}
               className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors ml-auto"
             >
@@ -236,11 +236,13 @@ export function FaqsPage() {
         </div>
       ) : (
         <div className="space-y-2">
-          {filtered.map((faq: Faq) => (
-            <FaqCard key={faq.id} faq={faq} />
+          {filtered.map((faq: Faq, i: number) => (
+            <FaqCard key={faq.id ?? `faq-${i}`} faq={faq} />
           ))}
         </div>
       )}
     </div>
   )
 }
+
+

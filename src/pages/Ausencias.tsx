@@ -120,7 +120,7 @@ export function AusenciasPage() {
           { label: "Esta semana", value: estaSemana, icon: Calendar, alert: false, color: "border-l-4 border-amber-400" },
           { label: "Sin justificar", value: sinJustificar, icon: AlertTriangle, alert: sinJustificar > 0, color: "border-l-4 border-orange-400" },
         ].map(({ label, value, icon: Icon, alert, color }) => (
-          <div key={label} className={`bg-white rounded-xl shadow-sm p-4 ${color}`}>
+          <div key={label} className={`bg-white rounded-xl shadow-sm p-4 border border-gray-200 ${color}`}>
             <div className="flex items-center justify-between mb-1">
               <p className="text-xs text-gray-500 font-medium">{label}</p>
               <Icon size={14} className={alert && value > 0 ? "text-orange-400" : "text-gray-300"} />
@@ -202,3 +202,4 @@ export function AusenciasPage() {
     </div>
   )
 }
+

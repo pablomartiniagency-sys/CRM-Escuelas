@@ -162,13 +162,7 @@ export function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="tu@empresa.com"
                   required
-                  className="w-full pl-10 pr-4 py-3 text-sm text-white rounded-xl border transition-all outline-none"
-                  style={{
-                    background: "rgba(255,255,255,0.05)",
-                    borderColor: "rgba(255,255,255,0.08)",
-                  }}
-                  onFocus={(e) => { e.target.style.borderColor = "#3b82f6"; e.target.style.background = "rgba(59,130,246,0.08)" }}
-                  onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; e.target.style.background = "rgba(255,255,255,0.05)" }}
+                  className="w-full pl-10 pr-4 py-3 text-sm text-white rounded-xl border border-white/[0.08] bg-white/[0.05] transition-all outline-none focus:border-blue-500 focus:bg-blue-500/[0.08] placeholder:text-gray-600"
                 />
               </div>
             </div>
@@ -184,13 +178,7 @@ export function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full pl-10 pr-10 py-3 text-sm text-white rounded-xl border transition-all outline-none"
-                  style={{
-                    background: "rgba(255,255,255,0.05)",
-                    borderColor: "rgba(255,255,255,0.08)",
-                  }}
-                  onFocus={(e) => { e.target.style.borderColor = "#3b82f6"; e.target.style.background = "rgba(59,130,246,0.08)" }}
-                  onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; e.target.style.background = "rgba(255,255,255,0.05)" }}
+                  className="w-full pl-10 pr-10 py-3 text-sm text-white rounded-xl border border-white/[0.08] bg-white/[0.05] transition-all outline-none focus:border-blue-500 focus:bg-blue-500/[0.08] placeholder:text-gray-600"
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors">
@@ -254,3 +242,4 @@ export function LoginPage() {
     </div>
   )
 }
+

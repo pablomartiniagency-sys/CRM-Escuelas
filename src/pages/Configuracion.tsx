@@ -1,4 +1,5 @@
 ﻿import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { Settings, User, Users, Plug, Bell, Palette } from "lucide-react"
 
@@ -13,7 +14,8 @@ const TABS = [
 export function ConfiguracionPage() {
   const [tab, setTab] = useState("perfil")
   const { user } = useAuth()
-  const handleSignOut = () => { localStorage.removeItem("educrm_demo_mode"); window.location.href = "/login" }
+  const navigate = useNavigate()
+  const handleSignOut = () => { localStorage.removeItem("educrm_demo_mode"); navigate("/login") }
 
   return (
     <div className="space-y-5">
@@ -127,4 +129,5 @@ export function ConfiguracionPage() {
     </div>
   )
 }
+
 

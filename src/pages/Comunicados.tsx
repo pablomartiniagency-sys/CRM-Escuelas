@@ -166,7 +166,7 @@ export function ComunicadosPage() {
           { label: "Borradores", value: borradores, color: "border-l-4 border-amber-400" },
           { label: "Enviados", value: enviados, color: "border-l-4 border-emerald-400" },
         ].map(({ label, value, color }) => (
-          <div key={label} className={`bg-white rounded-xl shadow-sm p-4 ${color}`}>
+          <div key={label} className={`bg-white rounded-xl shadow-sm p-4 border border-gray-200 ${color}`}>
             <p className="text-xs text-gray-500 font-medium mb-0.5">{label}</p>
             <p className="text-2xl font-bold text-gray-900">{value}</p>
           </div>
@@ -284,3 +284,4 @@ export function ComunicadosPage() {
     </div>
   )
 }
+
