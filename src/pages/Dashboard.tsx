@@ -94,13 +94,15 @@ export function DashboardPage() {
     },
   })
 
+  const STATUS_ES: Record<string, string> = { active: "Activos", prospect: "Prospectos", inactive: "Inactivos" }
+
   const { data: clientesDist = [] } = useQuery({
     queryKey: ["clientes-distribucion"],
     queryFn: async () => {
       const { data } = await supabase.from("clientes").select("status")
       const counts: Record<string, number> = {}
       data?.forEach((c: { status: string }) => { counts[c.status] = (counts[c.status] ?? 0) + 1 })
-      return Object.entries(counts).map(([name, value]) => ({ name, value }))
+      return Object.entries(counts).map(([key, value]) => ({ name: STATUS_ES[key] ?? key, value }))
     },
   })
 
@@ -182,7 +184,7 @@ export function DashboardPage() {
                     <p className="text-sm font-medium text-gray-800 truncate">{act.asunto ?? act.tipo}</p>
                     <p className="text-xs text-gray-400 truncate">
                       {act.clientes?.nombre ?? ""}
-                      {act.contactos?.nombre_completo ? " · " + act.contactos.nombre_completo : ""}
+                      {act.contactos?.nombre_completo ? " Â· " + act.contactos.nombre_completo : ""}
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-1 flex-shrink-0">
@@ -252,5 +254,7 @@ export function DashboardPage() {
     </div>
   )
 }
+
+
 
 

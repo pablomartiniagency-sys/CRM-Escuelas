@@ -69,6 +69,7 @@ export function Header() {
   }
 
   const handleLogout = async () => {
+    localStorage.removeItem("educrm_demo_mode")
     await supabase.auth.signOut()
     navigate("/login")
   }
@@ -167,3 +168,4 @@ export function Header() {
     </header>
   )
 }
+

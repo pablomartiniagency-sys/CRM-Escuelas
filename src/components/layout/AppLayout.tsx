@@ -5,7 +5,7 @@ import { Toaster } from "sonner"
 
 export function AppLayout() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <Sidebar />
       <Header />
       <main className="ml-[240px] pt-[60px] min-h-screen">
@@ -17,3 +17,4 @@ export function AppLayout() {
     </div>
   )
 }
+

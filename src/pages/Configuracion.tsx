@@ -12,7 +12,8 @@ const TABS = [
 
 export function ConfiguracionPage() {
   const [tab, setTab] = useState("perfil")
-  const { user, signOut } = useAuth()
+  const { user } = useAuth()
+  const handleSignOut = () => { localStorage.removeItem("educrm_demo_mode"); window.location.href = "/login" }
 
   return (
     <div className="space-y-5">
@@ -67,7 +68,7 @@ export function ConfiguracionPage() {
               </div>
               <div className="pt-4 border-t border-gray-100">
                 <button
-                  onClick={signOut}
+                  onClick={handleSignOut}
                   className="px-4 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors font-medium"
                 >
                   Cerrar sesion
@@ -126,3 +127,4 @@ export function ConfiguracionPage() {
     </div>
   )
 }
+
