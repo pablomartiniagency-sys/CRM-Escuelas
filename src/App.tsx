@@ -1,18 +1,29 @@
 ﻿import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { lazy, Suspense } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { AppLayout } from "@/components/layout/AppLayout"
 import { LoginPage } from "@/pages/Login"
-import { DashboardPage } from "@/pages/Dashboard"
-import { ClientesPage } from "@/pages/Clientes"
-import { ContactosPage } from "@/pages/Contactos"
-import { AlumnosPage } from "@/pages/Alumnos"
-import { ActividadesPage } from "@/pages/Actividades"
-import { LeadsPage } from "@/pages/Leads"
-import { ComunicadosPage } from "@/pages/Comunicados"
-import { AusenciasPage } from "@/pages/Ausencias"
-import { EventosPage } from "@/pages/Eventos"
-import { FaqsPage } from "@/pages/Faqs"
-import { ConfiguracionPage } from "@/pages/Configuracion"
+
+// Code splitting - lazy load every page
+const DashboardPage   = lazy(() => import("@/pages/Dashboard").then(m => ({ default: m.DashboardPage })))
+const ClientesPage    = lazy(() => import("@/pages/Clientes").then(m => ({ default: m.ClientesPage })))
+const ContactosPage   = lazy(() => import("@/pages/Contactos").then(m => ({ default: m.ContactosPage })))
+const AlumnosPage     = lazy(() => import("@/pages/Alumnos").then(m => ({ default: m.AlumnosPage })))
+const ActividadesPage = lazy(() => import("@/pages/Actividades").then(m => ({ default: m.ActividadesPage })))
+const LeadsPage       = lazy(() => import("@/pages/Leads").then(m => ({ default: m.LeadsPage })))
+const ComunicadosPage = lazy(() => import("@/pages/Comunicados").then(m => ({ default: m.ComunicadosPage })))
+const AusenciasPage   = lazy(() => import("@/pages/Ausencias").then(m => ({ default: m.AusenciasPage })))
+const EventosPage     = lazy(() => import("@/pages/Eventos").then(m => ({ default: m.EventosPage })))
+const FaqsPage        = lazy(() => import("@/pages/Faqs").then(m => ({ default: m.FaqsPage })))
+const ConfigPage      = lazy(() => import("@/pages/Configuracion").then(m => ({ default: m.ConfiguracionPage })))
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center h-40">
+      <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+}
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -31,17 +42,17 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route element={<PrivateRoute><AppLayout /></PrivateRoute>}>
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/clientes" element={<ClientesPage />} />
-          <Route path="/contactos" element={<ContactosPage />} />
-          <Route path="/alumnos" element={<AlumnosPage />} />
-          <Route path="/actividades" element={<ActividadesPage />} />
-          <Route path="/leads" element={<LeadsPage />} />
-          <Route path="/comunicados" element={<ComunicadosPage />} />
-          <Route path="/ausencias" element={<AusenciasPage />} />
-          <Route path="/eventos" element={<EventosPage />} />
-          <Route path="/faqs" element={<FaqsPage />} />
-          <Route path="/configuracion" element={<ConfiguracionPage />} />
+          <Route path="/dashboard"    element={<Suspense fallback={<PageLoader />}><DashboardPage /></Suspense>} />
+          <Route path="/clientes"     element={<Suspense fallback={<PageLoader />}><ClientesPage /></Suspense>} />
+          <Route path="/contactos"    element={<Suspense fallback={<PageLoader />}><ContactosPage /></Suspense>} />
+          <Route path="/alumnos"      element={<Suspense fallback={<PageLoader />}><AlumnosPage /></Suspense>} />
+          <Route path="/actividades"  element={<Suspense fallback={<PageLoader />}><ActividadesPage /></Suspense>} />
+          <Route path="/leads"        element={<Suspense fallback={<PageLoader />}><LeadsPage /></Suspense>} />
+          <Route path="/comunicados"  element={<Suspense fallback={<PageLoader />}><ComunicadosPage /></Suspense>} />
+          <Route path="/ausencias"    element={<Suspense fallback={<PageLoader />}><AusenciasPage /></Suspense>} />
+          <Route path="/eventos"      element={<Suspense fallback={<PageLoader />}><EventosPage /></Suspense>} />
+          <Route path="/faqs"         element={<Suspense fallback={<PageLoader />}><FaqsPage /></Suspense>} />
+          <Route path="/configuracion" element={<Suspense fallback={<PageLoader />}><ConfigPage /></Suspense>} />
         </Route>
       </Routes>
     </BrowserRouter>

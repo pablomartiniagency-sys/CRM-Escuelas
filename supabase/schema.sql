@@ -1,0 +1,1 @@
+﻿-- EduCRM Schema - see full version in docs
