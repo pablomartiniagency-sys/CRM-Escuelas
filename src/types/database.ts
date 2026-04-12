@@ -103,6 +103,7 @@ export interface Comunicado {
   aula_destino?: string
   nivel_destino?: string
   canal_envio?: CanalEnvio
+  asunto_email?: string
   fecha_envio?: string
   enviado?: boolean
   requiere_confirmacion?: boolean
@@ -149,6 +150,7 @@ export interface Evento {
   afecta_a?: string
   aula?: string
   nivel?: string
+  descripcion?: string
   comunicado_id?: string
   created_at?: string
   clientes?: { nombre: string }
@@ -175,3 +177,5 @@ export interface Usuario {
   created_at?: string
   roles?: { descripcion: string }
 }
+
+
