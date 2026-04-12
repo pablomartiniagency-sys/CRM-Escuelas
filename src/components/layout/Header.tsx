@@ -2,7 +2,7 @@
 import { useNavigate } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
 import { useAuth } from "@/hooks/useAuth"
-import { Search, Bell, LogOut, User, ChevronDown } from "lucide-react"
+import { Search, Bell, LogOut, User, ChevronDown, Menu } from "lucide-react"
 import { Avatar } from "@/components/ui/avatar"
 import { useQuery } from "@tanstack/react-query"
 
@@ -41,7 +41,11 @@ const TYPE_COLORS: Record<string, string> = {
   lead: "bg-amber-100 text-amber-700",
 }
 
-export function Header() {
+interface HeaderProps {
+  onMenuClick?: () => void
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
   const [query, setQuery] = useState("")
   const [showResults, setShowResults] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
@@ -52,7 +56,6 @@ export function Header() {
 
   const { data: results = [] } = useGlobalSearch(query)
 
-  // Cierre de dropdowns al hacer click fuera
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) setShowResults(false)
@@ -77,9 +80,14 @@ export function Header() {
   const userName = user?.email?.split("@")[0] ?? "Usuario"
 
   return (
-    <header className="fixed top-0 left-[240px] right-0 h-[60px] bg-white/95 backdrop-blur-sm border-b border-gray-200 z-20 flex items-center px-5 gap-4">
+    <header className="fixed top-0 right-0 left-0 lg:left-[240px] h-[60px] bg-white/95 backdrop-blur-sm border-b border-gray-200 z-20 flex items-center px-4 sm:px-5 gap-3">
 
-      {/* Busqueda global */}
+      {/* Hamburger for mobile */}
+      <button onClick={onMenuClick} className="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors flex-shrink-0">
+        <Menu size={20} />
+      </button>
+
+      {/* Global search */}
       <div ref={searchRef} className="relative flex-1 max-w-md">
         <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus-within:border-blue-400 focus-within:bg-white transition-all">
           <Search size={14} className="text-gray-400 flex-shrink-0" />
@@ -88,15 +96,14 @@ export function Header() {
             onChange={(e) => { setQuery(e.target.value); setShowResults(true) }}
             onFocus={() => setShowResults(true)}
             placeholder="Buscar clientes, alumnos, contactos..."
-            className="bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none w-full"
+            className="bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none w-full min-w-0"
           />
           {query && (
             <button onClick={() => { setQuery(""); setShowResults(false) }}
-              className="text-gray-300 hover:text-gray-500 text-xs">✕</button>
+              className="text-gray-300 hover:text-gray-500 text-xs flex-shrink-0">x</button>
           )}
         </div>
 
-        {/* Resultados */}
         {showResults && results.length > 0 && (
           <div className="absolute top-full mt-1.5 left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
             <div className="py-1 max-h-[320px] overflow-y-auto">
@@ -125,8 +132,8 @@ export function Header() {
       {/* Spacer */}
       <div className="flex-1" />
 
-      {/* Campana */}
-      <button className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors group">
+      {/* Bell */}
+      <button className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors group hidden sm:flex">
         <Bell size={17} className="text-gray-500 group-hover:text-gray-700" />
       </button>
 
@@ -134,14 +141,14 @@ export function Header() {
       <div ref={profileRef} className="relative">
         <button
           onClick={() => setShowProfile(!showProfile)}
-          className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+          className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
         >
           <Avatar name={userName} size="sm" />
           <div className="text-left hidden sm:block">
             <p className="text-sm font-medium text-gray-900 leading-none capitalize">{userName}</p>
             <p className="text-xs text-gray-400 leading-none mt-0.5">Admin</p>
           </div>
-          <ChevronDown size={13} className={`text-gray-400 transition-transform ${showProfile ? "rotate-180" : ""}`} />
+          <ChevronDown size={13} className={`text-gray-400 transition-transform hidden sm:block ${showProfile ? "rotate-180" : ""}`} />
         </button>
 
         {showProfile && (
@@ -168,4 +175,3 @@ export function Header() {
     </header>
   )
 }
-
