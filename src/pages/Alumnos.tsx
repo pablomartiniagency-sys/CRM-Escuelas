@@ -1,9 +1,11 @@
-﻿import { useQuery } from "@tanstack/react-query"
-import { supabase } from "@/lib/supabase"
+﻿import { useMemo, useState } from "react"
 import { useReactTable, getCoreRowModel, getSortedRowModel, flexRender, createColumnHelper } from "@tanstack/react-table"
-import { useMemo, useState } from "react"
 import { StatusBadge } from "@/components/ui/badge"
 import { TableSkeleton } from "@/components/ui/skeleton"
+import { SlidePanel } from "@/components/panels/SlidePanel"
+import { AlumnoPanel } from "@/components/panels/AlumnoPanel"
+import { AlumnoForm } from "@/components/forms/AlumnoForm"
+import { useAlumnos } from "@/hooks/queries/useAlumnos"
 import { GraduationCap, Search, AlertTriangle, Plus } from "lucide-react"
 import { differenceInYears, parseISO } from "date-fns"
 import type { Alumno } from "@/types/database"
@@ -12,26 +14,19 @@ const col = createColumnHelper<Alumno & { clientes?: { nombre: string } }>()
 
 export function AlumnosPage() {
   const [globalFilter, setGlobalFilter] = useState("")
-  const [activeFilter, setActiveFilter] = useState<string>("all")
+  const [activeFilter, setActiveFilter] = useState("all")
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [showCreate, setShowCreate] = useState(false)
 
-  const { data: alumnos = [], isLoading } = useQuery({
-    queryKey: ["alumnos"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("alumnos")
-        .select("*, clientes(nombre)")
-        .order("nombre_completo")
-      return data ?? []
-    },
-  })
+  const { data: alumnos = [], isLoading } = useAlumnos()
 
   const filtered = useMemo(() => {
     let d = alumnos
-    if (activeFilter === "active") d = d.filter((a: Alumno) => a.activo)
-    if (activeFilter === "inactive") d = d.filter((a: Alumno) => !a.activo)
+    if (activeFilter === "active") d = d.filter((a) => a.activo)
+    if (activeFilter === "inactive") d = d.filter((a) => !a.activo)
     if (globalFilter) {
       const q = globalFilter.toLowerCase()
-      d = d.filter((a: Alumno) => a.nombre_completo.toLowerCase().includes(q))
+      d = d.filter((a) => a.nombre_completo.toLowerCase().includes(q))
     }
     return d
   }, [alumnos, activeFilter, globalFilter])
@@ -45,8 +40,11 @@ export function AlumnosPage() {
             <GraduationCap size={14} className="text-violet-600" />
           </div>
           <div>
-            <p className="font-medium text-sm text-gray-900">{info.getValue()}</p>
-            <p className="text-xs text-gray-400">{info.row.original.alumno_id}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="font-medium text-sm text-gray-900">{info.getValue()}</p>
+              {info.row.original.alergias && <AlertTriangle size={12} className="text-orange-400" />}
+            </div>
+            <p className="text-xs text-gray-400 font-mono">{info.row.original.alumno_id}</p>
           </div>
         </div>
       ),
@@ -81,16 +79,6 @@ export function AlumnosPage() {
       header: "Estado",
       cell: (info) => <StatusBadge value={info.getValue() ? "active" : "inactive"} />,
     }),
-    col.accessor("alergias", {
-      header: "Alergias",
-      cell: (info) => info.getValue()
-        ? (
-          <span title={info.getValue() as string}>
-            <AlertTriangle size={15} className="text-orange-500" />
-          </span>
-        )
-        : null,
-    }),
   ], [])
 
   const table = useReactTable({
@@ -100,28 +88,30 @@ export function AlumnosPage() {
     getSortedRowModel: getSortedRowModel(),
   })
 
+  const conAlergias = alumnos.filter(a => a.alergias).length
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Alumnos</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{alumnos.length} alumnos registrados</p>
+          <p className="text-sm text-gray-500 mt-0.5">
+            {alumnos.length} alumnos
+            {conAlergias > 0 && <span className="ml-2 text-orange-500 font-medium">· {conAlergias} con alergias</span>}
+          </p>
         </div>
-        <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-3.5 py-2 rounded-lg transition-colors">
-          <Plus size={15} />
-          Nuevo alumno
+        <button onClick={() => setShowCreate(true)}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-3.5 py-2 rounded-lg transition-colors">
+          <Plus size={15} />Nuevo alumno
         </button>
       </div>
 
       <div className="flex items-center gap-3">
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
+          <input value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)}
             placeholder="Buscar alumnos..."
-            className="pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-56"
-          />
+            className="pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-56" />
         </div>
         <select value={activeFilter} onChange={(e) => setActiveFilter(e.target.value)}
           className="text-sm border border-gray-200 rounded-lg px-3 py-2">
@@ -131,13 +121,13 @@ export function AlumnosPage() {
         </select>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
         {isLoading ? <TableSkeleton /> : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 {table.getHeaderGroups().map((hg) => (
-                  <tr key={hg.id} className="border-b border-gray-100">
+                  <tr key={hg.id} className="border-b border-gray-100 bg-gray-50/50">
                     {hg.headers.map((h) => (
                       <th key={h.id} className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
                         {flexRender(h.column.columnDef.header, h.getContext())}
@@ -148,10 +138,11 @@ export function AlumnosPage() {
               </thead>
               <tbody>
                 {table.getRowModel().rows.length === 0 ? (
-                  <tr><td colSpan={columns.length} className="text-center py-12 text-gray-400 text-sm">No hay alumnos</td></tr>
+                  <tr><td colSpan={columns.length} className="text-center py-12 text-gray-400 text-sm">No hay alumnos que coincidan</td></tr>
                 ) : (
                   table.getRowModel().rows.map((row) => (
-                    <tr key={row.id} className="border-b border-gray-50 hover:bg-blue-50/30 transition-colors cursor-pointer">
+                    <tr key={row.id} onClick={() => setSelectedId(row.original.alumno_id)}
+                      className="border-b border-gray-50 hover:bg-blue-50/40 transition-colors cursor-pointer">
                       {row.getVisibleCells().map((cell) => (
                         <td key={cell.id} className="px-4 py-3">{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
                       ))}
@@ -162,10 +153,17 @@ export function AlumnosPage() {
             </table>
           </div>
         )}
-        <div className="px-4 py-2.5 border-t border-gray-100">
+        <div className="px-4 py-2.5 border-t border-gray-100 bg-gray-50/30">
           <span className="text-xs text-gray-400">{filtered.length} resultados</span>
         </div>
       </div>
+
+      <AlumnoPanel alumnoId={selectedId} onClose={() => setSelectedId(null)} />
+
+      <SlidePanel open={showCreate} onClose={() => setShowCreate(false)}
+        title="Nuevo alumno" subtitle="Registrar en el sistema" width="md">
+        <AlumnoForm onSuccess={() => setShowCreate(false)} />
+      </SlidePanel>
     </div>
   )
 }
