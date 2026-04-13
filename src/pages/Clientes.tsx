@@ -1,5 +1,11 @@
 ﻿import { useMemo, useState } from "react"
-import { useReactTable, getCoreRowModel, getSortedRowModel, flexRender, createColumnHelper } from "@tanstack/react-table"
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  flexRender,
+  createColumnHelper,
+} from "@tanstack/react-table"
 import { StatusBadge } from "@/components/ui/badge"
 import { TableSkeleton } from "@/components/ui/skeleton"
 import { SlidePanel } from "@/components/panels/SlidePanel"
@@ -24,55 +30,67 @@ export function ClientesPage() {
     if (statusFilter !== "all") d = d.filter((c) => c.status === statusFilter)
     if (globalFilter) {
       const q = globalFilter.toLowerCase()
-      d = d.filter((c) =>
-        c.nombre.toLowerCase().includes(q) ||
-        (c.ciudad ?? "").toLowerCase().includes(q) ||
-        (c.email_principal ?? "").toLowerCase().includes(q)
+      d = d.filter(
+        (c) =>
+          c.nombre.toLowerCase().includes(q) ||
+          (c.ciudad ?? "").toLowerCase().includes(q) ||
+          (c.email_principal ?? "").toLowerCase().includes(q)
       )
     }
     return d
   }, [clientes, statusFilter, globalFilter])
 
-  const columns = useMemo(() => [
-    col.accessor("nombre", {
-      header: "Centro educativo",
-      cell: (info) => (
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-            <Building2 size={14} className="text-blue-600" />
+  const columns = useMemo(
+    () => [
+      col.accessor("nombre", {
+        header: "Centro educativo",
+        cell: (info) => (
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+              <Building2 size={14} className="text-blue-600" />
+            </div>
+            <div>
+              <p className="font-medium text-sm text-gray-900">{info.getValue()}</p>
+              <p className="text-xs text-gray-400 font-mono">{info.row.original.cliente_id}</p>
+            </div>
           </div>
-          <div>
-            <p className="font-medium text-sm text-gray-900">{info.getValue()}</p>
-            <p className="text-xs text-gray-400 font-mono">{info.row.original.cliente_id}</p>
-          </div>
-        </div>
-      ),
-    }),
-    col.accessor("sector", {
-      header: "Sector",
-      cell: (info) => info.getValue()
-        ? <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{info.getValue()}</span>
-        : <span className="text-gray-300 text-sm">-</span>,
-    }),
-    col.accessor("ciudad", {
-      header: "Ciudad",
-      cell: (info) => <span className="text-sm text-gray-600">{info.getValue() ?? "-"}</span>,
-    }),
-    col.accessor("email_principal", {
-      header: "Email",
-      cell: (info) => <span className="text-sm text-gray-500">{info.getValue() ?? "-"}</span>,
-    }),
-    col.accessor("status", {
-      header: "Estado",
-      cell: (info) => <StatusBadge value={info.getValue()} />,
-    }),
-    col.accessor("rgpd_vigente", {
-      header: "RGPD",
-      cell: (info) => info.getValue()
-        ? <ShieldCheck size={16} className="text-emerald-500" />
-        : <ShieldOff size={16} className="text-gray-300" />,
-    }),
-  ], [])
+        ),
+      }),
+      col.accessor("sector", {
+        header: "Sector",
+        cell: (info) =>
+          info.getValue() ? (
+            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+              {info.getValue()}
+            </span>
+          ) : (
+            <span className="text-gray-300 text-sm">-</span>
+          ),
+      }),
+      col.accessor("ciudad", {
+        header: "Ciudad",
+        cell: (info) => <span className="text-sm text-gray-600">{info.getValue() ?? "-"}</span>,
+      }),
+      col.accessor("email_principal", {
+        header: "Email",
+        cell: (info) => <span className="text-sm text-gray-500">{info.getValue() ?? "-"}</span>,
+      }),
+      col.accessor("status", {
+        header: "Estado",
+        cell: (info) => <StatusBadge value={info.getValue()} />,
+      }),
+      col.accessor("rgpd_vigente", {
+        header: "RGPD",
+        cell: (info) =>
+          info.getValue() ? (
+            <ShieldCheck size={16} className="text-emerald-500" />
+          ) : (
+            <ShieldOff size={16} className="text-gray-300" />
+          ),
+      }),
+    ],
+    []
+  )
 
   const table = useReactTable({
     data: filtered,
@@ -107,8 +125,11 @@ export function ClientesPage() {
             className="pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-56"
           />
         </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-          className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none">
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none"
+        >
           <option value="all">Todos los estados</option>
           <option value="prospect">Prospecto</option>
           <option value="active">Activo</option>
@@ -116,23 +137,28 @@ export function ClientesPage() {
         </select>
         <div className="flex gap-2 ml-auto text-xs text-gray-500">
           <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded-full">
-            {clientes.filter(c => c.status === "prospect").length} prospectos
+            {clientes.filter((c) => c.status === "prospect").length} prospectos
           </span>
           <span className="bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full">
-            {clientes.filter(c => c.status === "active").length} activos
+            {clientes.filter((c) => c.status === "active").length} activos
           </span>
         </div>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-        {isLoading ? <TableSkeleton /> : (
+        {isLoading ? (
+          <TableSkeleton />
+        ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 {table.getHeaderGroups().map((hg) => (
                   <tr key={hg.id} className="border-b border-gray-100 bg-gray-50/50">
                     {hg.headers.map((h) => (
-                      <th key={h.id} className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3 whitespace-nowrap">
+                      <th
+                        key={h.id}
+                        className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3 whitespace-nowrap"
+                      >
                         {flexRender(h.column.columnDef.header, h.getContext())}
                       </th>
                     ))}
@@ -172,10 +198,7 @@ export function ClientesPage() {
       </div>
 
       {/* Panel: Ficha cliente */}
-      <ClientePanel
-        clienteId={selectedId}
-        onClose={() => setSelectedId(null)}
-      />
+      <ClientePanel clienteId={selectedId} onClose={() => setSelectedId(null)} />
 
       {/* Panel: Crear cliente */}
       <SlidePanel

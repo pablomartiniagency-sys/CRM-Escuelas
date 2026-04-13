@@ -7,10 +7,7 @@ export function useAlumnos(clienteId?: string) {
   return useQuery({
     queryKey: ["alumnos", clienteId],
     queryFn: async () => {
-      let q = supabase
-        .from("alumnos")
-        .select("*, clientes(nombre)")
-        .order("nombre_completo")
+      let q = supabase.from("alumnos").select("*, clientes(nombre)").order("nombre_completo")
       if (clienteId) q = q.eq("cliente_id", clienteId)
       const { data, error } = await q
       if (error) throw error

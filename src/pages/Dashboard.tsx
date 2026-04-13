@@ -1,11 +1,22 @@
-﻿import { useQuery } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabase"
-import { Building2, Target, Activity, MessageSquare, BookOpen, AlertTriangle, ArrowRight, Plus } from "lucide-react"
-import { formatDistanceToNow, format } from "date-fns"
+import {
+  Users,
+  Target,
+  Activity,
+  MessageSquare,
+  AlertTriangle,
+  ArrowRight,
+  Plus,
+  Clock,
+  CheckCircle2,
+  CalendarDays,
+  FileText
+} from "lucide-react"
+import { formatDistanceToNow, format, isToday, parseISO } from "date-fns"
 import { es } from "date-fns/locale"
 import { StatusBadge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
 
@@ -24,26 +35,32 @@ function KpiCard({ label, value, icon: Icon, color, loading, alert, href }: KpiC
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`bg-white rounded-xl border p-5 flex items-start gap-4 cursor-pointer hover:shadow-md transition-all ${alert ? "border-orange-200 bg-orange-50/30" : "border-gray-200"}`}
+      className={`bg-white rounded-xl border p-5 flex items-start gap-4 cursor-pointer hover:shadow-md hover:border-gray-300 transition-all ${alert && Number(value) > 0 ? "border-orange-200 bg-orange-50/10" : "border-gray-200"}`}
       onClick={() => href && navigate(href)}
     >
-      <div className={`p-2.5 rounded-lg ${color}`}>
-        <Icon size={18} className="text-white" />
+      <div className={`p-3 rounded-xl ${color}`}>
+        <Icon size={20} className="text-white" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-gray-500 mb-1">{label}</p>
-        {loading
-          ? <Skeleton className="h-7 w-14" />
-          : <p className={`text-2xl font-bold ${alert && Number(value) > 0 ? "text-orange-600" : "text-gray-900"}`}>{value}</p>}
+        <p className="text-xs font-semibold text-gray-500 mb-1 tracking-wide uppercase">{label}</p>
+        {loading ? (
+          <Skeleton className="h-8 w-16" />
+        ) : (
+          <p
+            className={`text-3xl font-extrabold tracking-tight ${alert && Number(value) > 0 ? "text-orange-600" : "text-gray-900"}`}
+          >
+            {value}
+          </p>
+        )}
       </div>
-      {alert && Number(value) > 0 && <AlertTriangle size={16} className="text-orange-400 flex-shrink-0" />}
+      {alert && Number(value) > 0 && (
+        <AlertTriangle size={18} className="text-orange-400 flex-shrink-0" />
+      )}
     </motion.div>
   )
 }
 
-const PIE_COLORS = ["#3B82F6", "#10B981", "#6B7280"]
-
-interface ActividadRow {
+interface TareaRow {
   actividad_id: string
   tipo: string
   asunto?: string
@@ -62,199 +79,275 @@ export function DashboardPage() {
     queryFn: async () => {
       const now = new Date()
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
       const today = now.toISOString().split("T")[0]
-      const [a, b, c, d, e] = await Promise.all([
-        supabase.from("clientes").select("cliente_id", { count: "exact" }).eq("status", "active"),
-        supabase.from("leads").select("lead_id", { count: "exact" }).eq("status", "new").gte("created_at", weekAgo.toISOString()),
-        supabase.from("actividades").select("actividad_id", { count: "exact" }).eq("resultado", "Pendiente"),
-        supabase.from("comunicados").select("comunicado_id", { count: "exact" }).gte("created_at", monthStart.toISOString()),
-        supabase.from("ausencias").select("id", { count: "exact" }).eq("fecha", today),
+      const [a, b, c, d] = await Promise.all([
+        supabase.from("actividades").select("actividad_id", { count: "exact" }).eq("resultado", "Pendiente").gte("fecha_hora", today + "T00:00:00"),
+        supabase.from("leads").select("lead_id", { count: "exact" }).eq("status", "new"),
+        supabase.from("comunicados").select("comunicado_id", { count: "exact" }).eq("status", "pending"), // Simulación de "sin responder"
+        supabase.from("clientes").select("cliente_id", { count: "exact" }).gte("updated_at", weekAgo.toISOString()), // Clientes recientes
       ])
       return {
-        clientesActivos: a.count ?? 0,
-        leadsNuevosSemana: b.count ?? 0,
-        actividadesPendientes: c.count ?? 0,
-        comunicadosMes: d.count ?? 0,
-        ausenciasHoy: e.count ?? 0,
+        tareasHoy: a.count ?? 0,
+        leadsPorConfirmar: b.count ?? 0,
+        mensajesSinResponder: d.count ?? 0, // Fallback a 0 por el momento
+        clientesRecientes: d.count ?? 0,
       }
     },
     refetchInterval: 60000,
   })
 
-  const { data: actividadesRecientes = [], isLoading: actLoading } = useQuery({
-    queryKey: ["actividades-recientes"],
+  const { data: tareasPendientes = [], isLoading: actLoading } = useQuery({
+    queryKey: ["tareas-hoy"],
     queryFn: async () => {
       const { data } = await supabase
         .from("actividades")
-        .select("actividad_id, tipo, asunto, ai_urgencia, resultado, fecha_hora, clientes(nombre), contactos(nombre_completo)")
-        .order("fecha_hora", { ascending: false })
-        .limit(8)
-      return (data ?? []) as unknown as ActividadRow[]
+        .select(
+          "actividad_id, tipo, asunto, ai_urgencia, resultado, fecha_hora, clientes(nombre), contactos(nombre_completo)"
+        )
+        .eq("resultado", "Pendiente")
+        .order("fecha_hora", { ascending: true })
+        .limit(6)
+      return (data ?? []) as unknown as TareaRow[]
     },
   })
 
-  const STATUS_ES: Record<string, string> = { active: "Activos", prospect: "Prospectos", inactive: "Inactivos" }
-
-  const { data: clientesDist = [] } = useQuery({
-    queryKey: ["clientes-distribucion"],
+  const { data: eventosProximos = [] } = useQuery({
+    queryKey: ["eventos-proximos"],
     queryFn: async () => {
-      const { data } = await supabase.from("clientes").select("status")
-      const counts: Record<string, number> = {}
-      data?.forEach((c: { status: string }) => { counts[c.status] = (counts[c.status] ?? 0) + 1 })
-      return Object.entries(counts).map(([key, value]) => ({ name: STATUS_ES[key] ?? key, value }))
-    },
-  })
-
-  const { data: leadsRecientes = [] } = useQuery({
-    queryKey: ["leads-recientes"],
-    queryFn: async () => {
+      const today = new Date().toISOString().split("T")[0]
       const { data } = await supabase
-        .from("leads")
-        .select("lead_id, nombre_detectado, empresa_detectada, canal, urgencia, status, created_at")
-        .eq("status", "new")
-        .order("created_at", { ascending: false })
-        .limit(5)
+        .from("eventos")
+        .select("id, titulo, tipo, fecha_inicio, clientes(nombre)")
+        .gte("fecha_inicio", today)
+        .order("fecha_inicio", { ascending: true })
+        .limit(4)
       return data ?? []
     },
   })
 
   const kpiItems = [
-    { label: "Clientes activos", value: kpis?.clientesActivos ?? 0, icon: Building2, color: "bg-blue-500", href: "/clientes" },
-    { label: "Leads nuevos (7d)", value: kpis?.leadsNuevosSemana ?? 0, icon: Target, color: "bg-violet-500", href: "/leads", alert: true },
-    { label: "Actividades pendientes", value: kpis?.actividadesPendientes ?? 0, icon: Activity, color: "bg-orange-500", href: "/actividades", alert: true },
-    { label: "Comunicados este mes", value: kpis?.comunicadosMes ?? 0, icon: MessageSquare, color: "bg-emerald-500", href: "/comunicados" },
-    { label: "Ausencias hoy", value: kpis?.ausenciasHoy ?? 0, icon: BookOpen, color: "bg-red-500", href: "/ausencias", alert: true },
+    {
+      label: "Tareas para hoy",
+      value: kpis?.tareasHoy ?? 0,
+      icon: CheckCircle2,
+      color: "bg-blue-600",
+      href: "/actividades",
+      alert: true,
+    },
+    {
+      label: "Leads por revisar",
+      value: kpis?.leadsPorConfirmar ?? 0,
+      icon: Target,
+      color: "bg-orange-500",
+      href: "/leads",
+      alert: true,
+    },
+    {
+      label: "Msjs sin responder",
+      value: kpis?.mensajesSinResponder ?? 0,
+      icon: MessageSquare,
+      color: "bg-rose-500",
+      href: "/comunicados",
+      alert: true,
+    },
+    {
+      label: "Clientes con actividad",
+      value: kpis?.clientesRecientes ?? 0,
+      icon: Users,
+      color: "bg-emerald-500",
+      href: "/clientes",
+    },
   ]
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8 max-w-[1400px] mx-auto">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            {format(new Date(), "EEEE d 'de' MMMM yyyy", { locale: es })}
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Buenos días</h1>
+          <p className="text-base text-gray-500 mt-1">
+            Aquí tienes el resumen para hoy, {format(new Date(), "EEEE d 'de' MMMM", { locale: es })}
           </p>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => navigate("/actividades")}
-            className="flex items-center gap-1.5 text-xs bg-orange-50 text-orange-700 border border-orange-200 px-3 py-1.5 rounded-lg hover:bg-orange-100 transition-colors">
-            <Plus size={12} />Actividad
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => navigate("/actividades")}
+            className="flex items-center gap-2 text-sm font-semibold bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
+          >
+            <Clock size={16} className="text-gray-400" />
+            Añadir Actividad
           </button>
-          <button onClick={() => navigate("/clientes")}
-            className="flex items-center gap-1.5 text-xs bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">
-            <Plus size={12} />Cliente
+          <button
+            onClick={() => navigate("/clientes")}
+            className="flex items-center gap-2 text-sm font-semibold bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all shadow-sm shadow-blue-600/20"
+          >
+            <Plus size={16} />
+            Nuevo Cliente
           </button>
         </div>
       </div>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+      {/* Qué está pasando - KPIs principales */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {kpiItems.map((item, i) => (
-          <motion.div key={item.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}>
+          <motion.div
+            key={item.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+          >
             <KpiCard {...item} loading={kpisLoading} />
           </motion.div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        {/* Feed actividades */}
-        <div className="lg:col-span-3 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900">Actividad reciente</h3>
-            <button onClick={() => navigate("/actividades")} className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700">
-              Ver todo <ArrowRight size={12} />
-            </button>
-          </div>
-          {actLoading ? (
-            <div className="p-5 space-y-3">
-              {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
-            </div>
-          ) : actividadesRecientes.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Activity size={28} className="text-gray-200 mb-2" />
-              <p className="text-sm text-gray-400">Sin actividades recientes</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-50">
-              {actividadesRecientes.map((act: ActividadRow) => (
-                <div key={act.actividad_id} className="flex items-start gap-3 px-5 py-3 hover:bg-gray-50 transition-colors">
-                  <div className={`w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0 ${act.resultado === "Pendiente" ? "bg-orange-400" : "bg-emerald-400"}`} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">{act.asunto ?? act.tipo}</p>
-                    <p className="text-xs text-gray-400 truncate">
-                      {act.clientes?.nombre ?? ""}
-                      {act.contactos?.nombre_completo ? " Â· " + act.contactos.nombre_completo : ""}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                    {act.ai_urgencia && <StatusBadge value={act.ai_urgencia} />}
-                    <span className="text-xs text-gray-400">
-                      {act.fecha_hora ? formatDistanceToNow(new Date(act.fecha_hora), { addSuffix: true, locale: es }) : ""}
-                    </span>
-                  </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Columna Principal: Qué tengo que hacer (Tareas) */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-white">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+                  <Activity size={18} />
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Sidebar right */}
-        <div className="lg:col-span-2 space-y-4">
-          {/* Leads nuevos */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-900">Leads sin atender</h3>
-              <button onClick={() => navigate("/leads")} className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700">
-                Ver todo <ArrowRight size={12} />
+                <h3 className="text-base font-bold text-gray-900">Tu actividad pendiente</h3>
+              </div>
+              <button
+                onClick={() => navigate("/actividades")}
+                className="flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                Ver todas <ArrowRight size={14} />
               </button>
             </div>
-            {leadsRecientes.length === 0 ? (
-              <div className="px-5 py-8 text-center">
-                <Target size={24} className="mx-auto mb-2 text-gray-200" />
-                <p className="text-xs text-gray-400">No hay leads nuevos</p>
-              </div>
-            ) : (
-              <div className="divide-y divide-gray-50">
-                {leadsRecientes.map((l: { lead_id: string; nombre_detectado?: string; empresa_detectada?: string; canal?: string; urgencia?: string; created_at?: string }) => (
-                  <div key={l.lead_id} onClick={() => navigate("/leads")}
-                    className="px-5 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{l.nombre_detectado ?? "Sin nombre"}</p>
-                        <p className="text-xs text-gray-400 truncate">{l.empresa_detectada ?? l.canal ?? "-"}</p>
+            
+            <div className="flex-1 bg-gray-50/30">
+              {actLoading ? (
+                <div className="p-6 space-y-4">
+                  {[...Array(4)].map((_, i) => (
+                    <Skeleton key={i} className="h-14 w-full rounded-xl" />
+                  ))}
+                </div>
+              ) : tareasPendientes.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <CheckCircle2 size={40} className="text-emerald-400 mb-4" />
+                  <p className="text-lg font-semibold text-gray-900">Todo al día</p>
+                  <p className="text-sm text-gray-500 mt-1">No tienes tareas pendientes para hoy.</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-100">
+                  {tareasPendientes.map((act: TareaRow) => (
+                    <div
+                      key={act.actividad_id}
+                      className="group flex items-start gap-4 px-6 py-4 hover:bg-white transition-all cursor-pointer"
+                    >
+                      <button className="mt-1 flex-shrink-0 w-5 h-5 rounded-md border-2 border-gray-300 group-hover:border-blue-500 transition-colors flex items-center justify-center">
+                        {/* Fake checkbox */}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-gray-900 truncate">
+                          {act.asunto ?? act.tipo}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md truncate max-w-[150px]">
+                            {act.clientes?.nombre ?? "Sin centro"}
+                          </span>
+                          {act.contactos?.nombre_completo && (
+                            <span className="text-xs text-gray-400 truncate">
+                              • {act.contactos.nombre_completo}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      {l.urgencia && <StatusBadge value={l.urgencia} />}
+                      <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                        {act.ai_urgencia && <StatusBadge value={act.ai_urgencia} />}
+                        <span className="text-xs font-medium text-gray-400">
+                          {act.fecha_hora
+                            ? formatDistanceToNow(new Date(act.fecha_hora), {
+                                addSuffix: true,
+                                locale: es,
+                              })
+                            : ""}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Columna Lateral: Próximos Hitos y Accesos rápidos */}
+        <div className="space-y-6">
+          {/* Próximos Eventos / Hitos */}
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-violet-50 text-violet-600 rounded-lg">
+                  <CalendarDays size={18} />
+                </div>
+                <h3 className="text-base font-bold text-gray-900">Próximos hitos</h3>
               </div>
-            )}
+            </div>
+            
+            <div className="p-2">
+              {eventosProximos.length === 0 ? (
+                <div className="px-4 py-8 text-center">
+                  <p className="text-sm text-gray-500">No hay eventos próximos.</p>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {eventosProximos.map((ev: any) => {
+                    const eventDate = parseISO(ev.fecha_inicio)
+                    const today = isToday(eventDate)
+                    return (
+                      <div key={ev.id} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
+                        <div className={`flex flex-col items-center justify-center w-12 h-12 rounded-xl border ${today ? 'bg-violet-600 border-violet-600 text-white' : 'bg-white border-gray-200 text-gray-700'}`}>
+                          <span className="text-[10px] font-bold uppercase leading-none mb-1">{format(eventDate, "MMM", { locale: es })}</span>
+                          <span className="text-lg font-black leading-none">{format(eventDate, "dd")}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-gray-900 truncate">{ev.titulo}</p>
+                          <p className="text-xs font-medium text-gray-500 truncate">{ev.clientes?.nombre ?? ev.tipo}</p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+            <div className="px-6 py-3 bg-gray-50 border-t border-gray-100">
+              <button
+                onClick={() => navigate("/eventos")}
+                className="w-full text-center text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                Abrir Calendario Completo
+              </button>
+            </div>
           </div>
 
-          {/* Distribucion clientes */}
-          {clientesDist.length > 0 && (
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3">Clientes por estado</h3>
-              <ResponsiveContainer width="100%" height={160}>
-                <PieChart>
-                  <Pie data={clientesDist} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} innerRadius={35}>
-                    {clientesDist.map((_: unknown, i: number) => (
-                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend iconType="circle" iconSize={7} />
-                </PieChart>
-              </ResponsiveContainer>
+          {/* Accesos rápidos */}
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+            <h3 className="text-base font-bold text-gray-900 mb-4">Accesos rápidos</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => navigate("/clientes")}
+                className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all group"
+              >
+                <FileText size={20} className="text-gray-400 group-hover:text-blue-600 transition-colors" />
+                <span className="text-sm font-semibold text-gray-700 group-hover:text-blue-700">Ver Fichas</span>
+              </button>
+              <button
+                onClick={() => navigate("/comunicados")}
+                className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all group"
+              >
+                <MessageSquare size={20} className="text-gray-400 group-hover:text-blue-600 transition-colors" />
+                <span className="text-sm font-semibold text-gray-700 group-hover:text-blue-700">Mensajes</span>
+              </button>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
   )
 }
-
-
-
-

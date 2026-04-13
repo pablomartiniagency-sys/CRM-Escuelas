@@ -30,22 +30,28 @@ export function ClienteForm({ cliente, onSuccess }: ClienteFormProps) {
   const update = useUpdateCliente()
   const isPending = create.isPending || update.isPending
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: cliente ? {
-      nombre: cliente.nombre,
-      sector: cliente.sector ?? "",
-      ciudad: cliente.ciudad ?? "",
-      provincia: cliente.provincia ?? "",
-      email_principal: cliente.email_principal ?? "",
-      telefono_principal: cliente.telefono_principal ?? "",
-      status: cliente.status,
-      notas: cliente.notas ?? "",
-      rgpd_vigente: cliente.rgpd_vigente ?? false,
-    } : {
-      status: "prospect",
-      rgpd_vigente: false,
-    },
+    defaultValues: cliente
+      ? {
+          nombre: cliente.nombre,
+          sector: cliente.sector ?? "",
+          ciudad: cliente.ciudad ?? "",
+          provincia: cliente.provincia ?? "",
+          email_principal: cliente.email_principal ?? "",
+          telefono_principal: cliente.telefono_principal ?? "",
+          status: cliente.status,
+          notas: cliente.notas ?? "",
+          rgpd_vigente: cliente.rgpd_vigente ?? false,
+        }
+      : {
+          status: "prospect",
+          rgpd_vigente: false,
+        },
   })
 
   const onSubmit = async (data: FormData) => {
@@ -117,7 +123,9 @@ export function ClienteForm({ cliente, onSuccess }: ClienteFormProps) {
             type="email"
             className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          {errors.email_principal && <p className="text-xs text-red-500 mt-1">{errors.email_principal.message}</p>}
+          {errors.email_principal && (
+            <p className="text-xs text-red-500 mt-1">{errors.email_principal.message}</p>
+          )}
         </div>
 
         <div>
@@ -139,7 +147,9 @@ export function ClienteForm({ cliente, onSuccess }: ClienteFormProps) {
 
         <div className="col-span-2 flex items-center gap-2">
           <input type="checkbox" id="rgpd" {...register("rgpd_vigente")} className="rounded" />
-          <label htmlFor="rgpd" className="text-sm text-gray-700">RGPD vigente y aceptado por el centro</label>
+          <label htmlFor="rgpd" className="text-sm text-gray-700">
+            RGPD vigente y aceptado por el centro
+          </label>
         </div>
       </div>
 

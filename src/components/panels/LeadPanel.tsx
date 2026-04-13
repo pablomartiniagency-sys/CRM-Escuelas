@@ -5,8 +5,15 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useUpdateLeadStatus, useAsignarLeadACliente } from "@/hooks/queries/useLeads"
 import { useClientes } from "@/hooks/queries/useClientes"
 import {
-  Target, Mail, MessageCircle, Phone, Globe,
-  ArrowRight, Building2, ChevronRight, Loader2
+  Target,
+  Mail,
+  MessageCircle,
+  Phone,
+  Globe,
+  ArrowRight,
+  Building2,
+  ChevronRight,
+  Loader2,
 } from "lucide-react"
 import { formatDistanceToNow, format } from "date-fns"
 import { es } from "date-fns/locale"
@@ -14,8 +21,12 @@ import type { Lead, LeadStatus } from "@/types/database"
 import { cn } from "@/lib/utils"
 
 const CANAL_ICONS: Record<string, React.ElementType> = {
-  email: Mail, whatsapp: MessageCircle, telefono: Phone,
-  web: Globe, instagram: Globe, facebook: Globe,
+  email: Mail,
+  whatsapp: MessageCircle,
+  telefono: Phone,
+  web: Globe,
+  instagram: Globe,
+  facebook: Globe,
 }
 
 const PIPELINE: { status: LeadStatus; label: string; color: string }[] = [
@@ -48,24 +59,29 @@ export function LeadPanel({ lead, onClose }: LeadPanelProps) {
     >
       {!lead ? null : (
         <div className="p-6 space-y-5">
-
           {/* Pipeline visual */}
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Estado del pipeline</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              Estado del pipeline
+            </p>
             <div className="flex items-center gap-1">
               {PIPELINE.map((step, i) => {
                 const isCurrent = step.status === lead.status
-                const isPast = PIPELINE.findIndex(s => s.status === lead.status) > i
+                const isPast = PIPELINE.findIndex((s) => s.status === lead.status) > i
                 return (
                   <div key={step.status} className="flex items-center gap-1 flex-1">
                     <button
-                      onClick={() => !isCurrent && updateStatus.mutate({ id: lead.lead_id, status: step.status })}
+                      onClick={() =>
+                        !isCurrent && updateStatus.mutate({ id: lead.lead_id, status: step.status })
+                      }
                       disabled={isCurrent || updateStatus.isPending}
                       className={cn(
                         "flex-1 py-2 px-3 rounded-lg text-xs font-medium text-center transition-all",
-                        isCurrent ? `${step.color} text-white shadow-sm` :
-                        isPast ? "bg-gray-100 text-gray-400 cursor-pointer hover:bg-gray-200" :
-                        "bg-gray-50 text-gray-400 cursor-pointer hover:bg-gray-100 border border-dashed border-gray-200"
+                        isCurrent
+                          ? `${step.color} text-white shadow-sm`
+                          : isPast
+                            ? "bg-gray-100 text-gray-400 cursor-pointer hover:bg-gray-200"
+                            : "bg-gray-50 text-gray-400 cursor-pointer hover:bg-gray-100 border border-dashed border-gray-200"
                       )}
                     >
                       {step.label}
@@ -79,7 +95,8 @@ export function LeadPanel({ lead, onClose }: LeadPanelProps) {
             </div>
             {updateStatus.isPending && (
               <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                <Loader2 size={11} className="animate-spin" />Actualizando...
+                <Loader2 size={11} className="animate-spin" />
+                Actualizando...
               </p>
             )}
           </div>
@@ -89,8 +106,12 @@ export function LeadPanel({ lead, onClose }: LeadPanelProps) {
             <div className="col-span-2 p-4 bg-gray-50 rounded-xl border border-gray-200">
               <div className="flex items-center gap-2 mb-2">
                 <CanalIcon size={16} className="text-gray-500" />
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Canal de entrada</span>
-                <span className="ml-auto text-xs text-gray-400 capitalize">{lead.canal ?? "-"}</span>
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Canal de entrada
+                </span>
+                <span className="ml-auto text-xs text-gray-400 capitalize">
+                  {lead.canal ?? "-"}
+                </span>
               </div>
               {lead.resumen ? (
                 <p className="text-sm text-gray-700 leading-relaxed">{lead.resumen}</p>
@@ -137,7 +158,12 @@ export function LeadPanel({ lead, onClose }: LeadPanelProps) {
                 <div className="flex items-center gap-2">
                   <StatusBadge value="active" />
                   <span className="text-sm text-blue-700">
-                    Ya asignado a: {(clientes.find(c => c.cliente_id === lead.cliente_id) as { nombre?: string } | undefined)?.nombre ?? lead.cliente_id}
+                    Ya asignado a:{" "}
+                    {(
+                      clientes.find((c) => c.cliente_id === lead.cliente_id) as
+                        | { nombre?: string }
+                        | undefined
+                    )?.nombre ?? lead.cliente_id}
                   </span>
                 </div>
               ) : (
@@ -149,15 +175,24 @@ export function LeadPanel({ lead, onClose }: LeadPanelProps) {
                   >
                     <option value="">Seleccionar centro...</option>
                     {clientes.map((c: { cliente_id: string; nombre: string }) => (
-                      <option key={c.cliente_id} value={c.cliente_id}>{c.nombre}</option>
+                      <option key={c.cliente_id} value={c.cliente_id}>
+                        {c.nombre}
+                      </option>
                     ))}
                   </select>
                   <button
-                    onClick={() => assignClienteId && asignar.mutate({ leadId: lead.lead_id, clienteId: assignClienteId })}
+                    onClick={() =>
+                      assignClienteId &&
+                      asignar.mutate({ leadId: lead.lead_id, clienteId: assignClienteId })
+                    }
                     disabled={!assignClienteId || asignar.isPending}
                     className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
                   >
-                    {asignar.isPending ? <Loader2 size={14} className="animate-spin" /> : <ArrowRight size={14} />}
+                    {asignar.isPending ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <ArrowRight size={14} />
+                    )}
                     Asignar
                   </button>
                 </div>

@@ -1,8 +1,13 @@
 ﻿import { Component, type ErrorInfo, type ReactNode } from "react"
 import { AlertTriangle, RefreshCcw } from "lucide-react"
 
-interface Props { children: ReactNode }
-interface State { hasError: boolean; error: Error | null }
+interface Props {
+  children: ReactNode
+}
+interface State {
+  hasError: boolean
+  error: Error | null
+}
 
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
@@ -30,12 +35,15 @@ export class ErrorBoundary extends Component<Props, State> {
           <div>
             <h1 className="text-xl font-bold text-gray-900 mb-1">Algo salió mal</h1>
             <p className="text-sm text-gray-500 leading-relaxed">
-              Se ha producido un error inesperado. Puedes intentar recargar la página o volver al inicio.
+              Se ha producido un error inesperado. Puedes intentar recargar la página o volver al
+              inicio.
             </p>
           </div>
           {this.state.error && (
             <details className="text-left bg-gray-100 rounded-xl p-4 text-xs text-gray-600">
-              <summary className="cursor-pointer font-medium text-gray-700 mb-1">Detalles técnicos</summary>
+              <summary className="cursor-pointer font-medium text-gray-700 mb-1">
+                Detalles técnicos
+              </summary>
               <pre className="whitespace-pre-wrap mt-2 font-mono text-[11px] text-red-600">
                 {this.state.error.message}
               </pre>

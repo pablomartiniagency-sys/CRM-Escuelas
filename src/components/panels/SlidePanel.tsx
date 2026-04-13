@@ -12,11 +12,20 @@ interface SlidePanelProps {
   width?: "md" | "lg" | "xl"
 }
 
-export function SlidePanel({ open, onClose, title, subtitle, children, width = "lg" }: SlidePanelProps) {
+export function SlidePanel({
+  open,
+  onClose,
+  title,
+  subtitle,
+  children,
+  width = "lg",
+}: SlidePanelProps) {
   const widths = { md: "max-w-md", lg: "max-w-xl", xl: "max-w-2xl" }
 
   useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose() }
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose()
+    }
     document.addEventListener("keydown", handleKey)
     return () => document.removeEventListener("keydown", handleKey)
   }, [onClose])
@@ -59,9 +68,7 @@ export function SlidePanel({ open, onClose, title, subtitle, children, width = "
               </button>
             </div>
             {/* Body */}
-            <div className="flex-1 overflow-y-auto">
-              {children}
-            </div>
+            <div className="flex-1 overflow-y-auto">{children}</div>
           </motion.aside>
         </>
       )}

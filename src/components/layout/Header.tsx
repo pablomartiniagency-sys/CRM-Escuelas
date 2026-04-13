@@ -21,13 +21,49 @@ function useGlobalSearch(q: string) {
     queryFn: async () => {
       const results: SearchResult[] = []
       const [clientes, contactos, alumnos] = await Promise.all([
-        supabase.from("clientes").select("cliente_id, nombre, sector").ilike("nombre", `%${q}%`).limit(4),
-        supabase.from("contactos").select("contacto_id, nombre_completo, rol").ilike("nombre_completo", `%${q}%`).limit(4),
-        supabase.from("alumnos").select("alumno_id, nombre_completo, aula").ilike("nombre_completo", `%${q}%`).limit(4),
+        supabase
+          .from("clientes")
+          .select("cliente_id, nombre, sector")
+          .ilike("nombre", `%${q}%`)
+          .limit(4),
+        supabase
+          .from("contactos")
+          .select("contacto_id, nombre_completo, rol")
+          .ilike("nombre_completo", `%${q}%`)
+          .limit(4),
+        supabase
+          .from("alumnos")
+          .select("alumno_id, nombre_completo, aula")
+          .ilike("nombre_completo", `%${q}%`)
+          .limit(4),
       ])
-      clientes.data?.forEach(c => results.push({ id: c.cliente_id, label: c.nombre, sub: c.sector ?? "Centro educativo", href: "/clientes", type: "cliente" }))
-      contactos.data?.forEach(c => results.push({ id: c.contacto_id, label: c.nombre_completo, sub: c.rol ?? "Contacto", href: "/contactos", type: "contacto" }))
-      alumnos.data?.forEach(a => results.push({ id: a.alumno_id, label: a.nombre_completo, sub: a.aula ? `Aula ${a.aula}` : "Alumno", href: "/alumnos", type: "alumno" }))
+      clientes.data?.forEach((c) =>
+        results.push({
+          id: c.cliente_id,
+          label: c.nombre,
+          sub: c.sector ?? "Centro educativo",
+          href: "/clientes",
+          type: "cliente",
+        })
+      )
+      contactos.data?.forEach((c) =>
+        results.push({
+          id: c.contacto_id,
+          label: c.nombre_completo,
+          sub: c.rol ?? "Contacto",
+          href: "/contactos",
+          type: "contacto",
+        })
+      )
+      alumnos.data?.forEach((a) =>
+        results.push({
+          id: a.alumno_id,
+          label: a.nombre_completo,
+          sub: a.aula ? `Aula ${a.aula}` : "Alumno",
+          href: "/alumnos",
+          type: "alumno",
+        })
+      )
       return results
     },
     staleTime: 5000,
@@ -59,7 +95,8 @@ export function Header({ onMenuClick }: HeaderProps) {
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) setShowResults(false)
-      if (profileRef.current && !profileRef.current.contains(e.target as Node)) setShowProfile(false)
+      if (profileRef.current && !profileRef.current.contains(e.target as Node))
+        setShowProfile(false)
     }
     document.addEventListener("mousedown", handler)
     return () => document.removeEventListener("mousedown", handler)
@@ -81,9 +118,11 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   return (
     <header className="fixed top-0 right-0 left-0 lg:left-[240px] h-[60px] bg-white/95 backdrop-blur-sm border-b border-gray-200 z-20 flex items-center px-4 sm:px-5 gap-3">
-
       {/* Hamburger for mobile */}
-      <button onClick={onMenuClick} className="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors flex-shrink-0">
+      <button
+        onClick={onMenuClick}
+        className="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors flex-shrink-0"
+      >
         <Menu size={20} />
       </button>
 
@@ -93,14 +132,24 @@ export function Header({ onMenuClick }: HeaderProps) {
           <Search size={14} className="text-gray-400 flex-shrink-0" />
           <input
             value={query}
-            onChange={(e) => { setQuery(e.target.value); setShowResults(true) }}
+            onChange={(e) => {
+              setQuery(e.target.value)
+              setShowResults(true)
+            }}
             onFocus={() => setShowResults(true)}
             placeholder="Buscar clientes, alumnos, contactos..."
             className="bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none w-full min-w-0"
           />
           {query && (
-            <button onClick={() => { setQuery(""); setShowResults(false) }}
-              className="text-gray-300 hover:text-gray-500 text-xs flex-shrink-0">x</button>
+            <button
+              onClick={() => {
+                setQuery("")
+                setShowResults(false)
+              }}
+              className="text-gray-300 hover:text-gray-500 text-xs flex-shrink-0"
+            >
+              x
+            </button>
           )}
         </div>
 
@@ -108,13 +157,18 @@ export function Header({ onMenuClick }: HeaderProps) {
           <div className="absolute top-full mt-1.5 left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
             <div className="py-1 max-h-[320px] overflow-y-auto">
               {results.map((r: SearchResult) => (
-                <button key={r.id} onClick={() => handleSelect(r)}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left">
+                <button
+                  key={r.id}
+                  onClick={() => handleSelect(r)}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
+                >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">{r.label}</p>
                     <p className="text-xs text-gray-400 truncate">{r.sub}</p>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${TYPE_COLORS[r.type] ?? "bg-gray-100 text-gray-600"}`}>
+                  <span
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${TYPE_COLORS[r.type] ?? "bg-gray-100 text-gray-600"}`}
+                  >
                     {r.type}
                   </span>
                 </button>
@@ -148,7 +202,10 @@ export function Header({ onMenuClick }: HeaderProps) {
             <p className="text-sm font-medium text-gray-900 leading-none capitalize">{userName}</p>
             <p className="text-xs text-gray-400 leading-none mt-0.5">Admin</p>
           </div>
-          <ChevronDown size={13} className={`text-gray-400 transition-transform hidden sm:block ${showProfile ? "rotate-180" : ""}`} />
+          <ChevronDown
+            size={13}
+            className={`text-gray-400 transition-transform hidden sm:block ${showProfile ? "rotate-180" : ""}`}
+          />
         </button>
 
         {showProfile && (
@@ -158,13 +215,20 @@ export function Header({ onMenuClick }: HeaderProps) {
               <p className="text-xs text-gray-400 truncate">{user?.email}</p>
             </div>
             <div className="py-1">
-              <button onClick={() => { navigate("/configuracion"); setShowProfile(false) }}
-                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left">
+              <button
+                onClick={() => {
+                  navigate("/configuracion")
+                  setShowProfile(false)
+                }}
+                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+              >
                 <User size={15} className="text-gray-400" />
                 Mi perfil
               </button>
-              <button onClick={handleLogout}
-                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+              >
                 <LogOut size={15} />
                 Cerrar sesion
               </button>

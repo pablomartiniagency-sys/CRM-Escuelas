@@ -15,7 +15,10 @@ export function ConfiguracionPage() {
   const [tab, setTab] = useState("perfil")
   const { user } = useAuth()
   const navigate = useNavigate()
-  const handleSignOut = () => { localStorage.removeItem("educrm_demo_mode"); navigate("/login") }
+  const handleSignOut = () => {
+    localStorage.removeItem("educrm_demo_mode")
+    navigate("/login")
+  }
 
   return (
     <div className="space-y-5">
@@ -60,7 +63,9 @@ export function ConfiguracionPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">ID de usuario</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  ID de usuario
+                </label>
                 <input
                   type="text"
                   value={user?.id ?? ""}
@@ -83,14 +88,22 @@ export function ConfiguracionPage() {
             <div className="space-y-5 max-w-lg">
               <h2 className="text-base font-semibold text-gray-900">Integraciones</h2>
               <div className="rounded-lg bg-gray-50 border border-gray-200 p-4">
-                <p className="text-sm font-medium text-gray-700 mb-1">URL Webhook de entrada (n8n)</p>
-                <p className="text-xs text-gray-400 mb-2">Envia interacciones de WhatsApp/Email a esta URL</p>
+                <p className="text-sm font-medium text-gray-700 mb-1">
+                  URL Webhook de entrada (n8n)
+                </p>
+                <p className="text-xs text-gray-400 mb-2">
+                  Envia interacciones de WhatsApp/Email a esta URL
+                </p>
                 <div className="flex gap-2">
                   <code className="flex-1 text-xs bg-white border border-gray-200 rounded px-3 py-2 text-gray-600">
                     {window.location.origin}/api/webhook/actividad
                   </code>
                   <button
-                    onClick={() => navigator.clipboard.writeText(window.location.origin + "/api/webhook/actividad")}
+                    onClick={() =>
+                      navigator.clipboard.writeText(
+                        window.location.origin + "/api/webhook/actividad"
+                      )
+                    }
                     className="px-3 py-2 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                   >
                     Copiar
@@ -103,7 +116,9 @@ export function ConfiguracionPage() {
                     <p className="text-sm font-medium text-gray-700">Conexion WhatsApp</p>
                     <p className="text-xs text-gray-400 mt-0.5">Integrado via n8n</p>
                   </div>
-                  <span className="text-xs px-2 py-1 bg-gray-100 text-gray-500 rounded-full">No configurado</span>
+                  <span className="text-xs px-2 py-1 bg-gray-100 text-gray-500 rounded-full">
+                    No configurado
+                  </span>
                 </div>
               </div>
               <div className="rounded-lg bg-gray-50 border border-gray-200 p-4">
@@ -112,7 +127,9 @@ export function ConfiguracionPage() {
                     <p className="text-sm font-medium text-gray-700">Conexion Email (SMTP)</p>
                     <p className="text-xs text-gray-400 mt-0.5">Para envio de comunicados</p>
                   </div>
-                  <span className="text-xs px-2 py-1 bg-gray-100 text-gray-500 rounded-full">No configurado</span>
+                  <span className="text-xs px-2 py-1 bg-gray-100 text-gray-500 rounded-full">
+                    No configurado
+                  </span>
                 </div>
               </div>
             </div>
@@ -129,5 +146,3 @@ export function ConfiguracionPage() {
     </div>
   )
 }
-
-

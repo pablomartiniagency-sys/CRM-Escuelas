@@ -37,7 +37,10 @@ export function useAsignarLeadACliente() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ leadId, clienteId }: { leadId: string; clienteId: string }) => {
-      const { error } = await supabase.from("leads").update({ cliente_id: clienteId, status: "contacted" }).eq("lead_id", leadId)
+      const { error } = await supabase
+        .from("leads")
+        .update({ cliente_id: clienteId, status: "contacted" })
+        .eq("lead_id", leadId)
       if (error) throw error
     },
     onSuccess: () => {

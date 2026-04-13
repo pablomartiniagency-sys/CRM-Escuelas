@@ -177,5 +177,3 @@ export interface Usuario {
   created_at?: string
   roles?: { descripcion: string }
 }
-
-

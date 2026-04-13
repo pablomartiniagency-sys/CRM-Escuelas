@@ -6,9 +6,9 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error(
     "[EduCRM] Variables de entorno faltantes.\n" +
-    "Crea un archivo .env.local con:\n" +
-    "  VITE_SUPABASE_URL=https://tu-proyecto.supabase.co\n" +
-    "  VITE_SUPABASE_ANON_KEY=tu-anon-key"
+      "Crea un archivo .env.local con:\n" +
+      "  VITE_SUPABASE_URL=https://tu-proyecto.supabase.co\n" +
+      "  VITE_SUPABASE_ANON_KEY=tu-anon-key"
   )
 }
 

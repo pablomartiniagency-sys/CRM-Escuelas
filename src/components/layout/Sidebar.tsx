@@ -2,8 +2,19 @@
 import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabase"
 import {
-  LayoutDashboard, Building2, Users, GraduationCap, Activity,
-  Target, MessageSquare, BookOpen, Calendar, HelpCircle, Settings, ChevronRight, X
+  LayoutDashboard,
+  Building2,
+  Users,
+  GraduationCap,
+  Activity,
+  Target,
+  MessageSquare,
+  BookOpen,
+  Calendar,
+  HelpCircle,
+  Settings,
+  ChevronRight,
+  X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -33,10 +44,20 @@ function useSidebarBadges() {
     queryFn: async () => {
       const today = new Date().toISOString().split("T")[0]
       const [act, leads, com, aus] = await Promise.all([
-        supabase.from("actividades").select("actividad_id", { count: "exact" }).eq("resultado", "Pendiente"),
+        supabase
+          .from("actividades")
+          .select("actividad_id", { count: "exact" })
+          .eq("resultado", "Pendiente"),
         supabase.from("leads").select("lead_id", { count: "exact" }).eq("status", "new"),
-        supabase.from("comunicados").select("comunicado_id", { count: "exact" }).eq("enviado", false),
-        supabase.from("ausencias").select("id", { count: "exact" }).eq("fecha", today).eq("justificada", false),
+        supabase
+          .from("comunicados")
+          .select("comunicado_id", { count: "exact" })
+          .eq("enviado", false),
+        supabase
+          .from("ausencias")
+          .select("id", { count: "exact" })
+          .eq("fecha", today)
+          .eq("justificada", false),
       ])
       return {
         pendientes: act.count ?? 0,
@@ -63,14 +84,16 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   }
 
   return (
-    <aside className={cn(
-      "fixed left-0 top-0 h-screen flex flex-col bg-white border-r border-gray-200 z-40 transition-transform duration-200",
-      "w-[240px]",
-      // Mobile: hidden by default, shown when open
-      open ? "translate-x-0" : "-translate-x-full",
-      // Desktop: always visible
-      "lg:translate-x-0"
-    )}>
+    <aside
+      className={cn(
+        "fixed left-0 top-0 h-screen flex flex-col bg-white border-r border-gray-200 z-40 transition-transform duration-200",
+        "w-[240px]",
+        // Mobile: hidden by default, shown when open
+        open ? "translate-x-0" : "-translate-x-full",
+        // Desktop: always visible
+        "lg:translate-x-0"
+      )}
+    >
       {/* Logo + mobile close */}
       <div className="h-[60px] flex items-center justify-between px-5 border-b border-gray-100 flex-shrink-0">
         <div className="flex items-center gap-2.5">
@@ -83,7 +106,10 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </div>
         </div>
         {/* Mobile close button */}
-        <button onClick={onClose} className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+        <button
+          onClick={onClose}
+          className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+        >
           <X size={18} />
         </button>
       </div>
@@ -108,13 +134,20 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             >
               {({ isActive }) => (
                 <>
-                  <Icon size={17} className={isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"} />
+                  <Icon
+                    size={17}
+                    className={
+                      isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"
+                    }
+                  />
                   <span className="flex-1 truncate">{label}</span>
                   {count > 0 && (
-                    <span className={cn(
-                      "text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none",
-                      isActive ? "bg-blue-600 text-white" : "bg-orange-100 text-orange-700"
-                    )}>
+                    <span
+                      className={cn(
+                        "text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none",
+                        isActive ? "bg-blue-600 text-white" : "bg-orange-100 text-orange-700"
+                      )}
+                    >
                       {count > 99 ? "99+" : count}
                     </span>
                   )}
@@ -134,7 +167,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           className={({ isActive }) =>
             cn(
               "flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
-              isActive ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              isActive
+                ? "bg-blue-50 text-blue-700"
+                : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
             )
           }
         >

@@ -33,25 +33,31 @@ export function ContactoForm({ contacto, defaultClienteId, onSuccess }: Contacto
   const { data: clientes = [] } = useClientes()
   const isPending = create.isPending || update.isPending
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: contacto ? {
-      nombre_completo: contacto.nombre_completo,
-      cliente_id: contacto.cliente_id,
-      rol: contacto.rol ?? "",
-      email: contacto.email ?? "",
-      telefono: contacto.telefono ?? "",
-      canal_preferido: contacto.canal_preferido,
-      categoria_contacto_base: contacto.categoria_contacto_base,
-      acepta_comunicados: contacto.acepta_comunicados ?? true,
-      activo: contacto.activo ?? true,
-    } : {
-      cliente_id: defaultClienteId ?? "",
-      acepta_comunicados: true,
-      activo: true,
-      categoria_contacto_base: "familia",
-      canal_preferido: "whatsapp",
-    },
+    defaultValues: contacto
+      ? {
+          nombre_completo: contacto.nombre_completo,
+          cliente_id: contacto.cliente_id,
+          rol: contacto.rol ?? "",
+          email: contacto.email ?? "",
+          telefono: contacto.telefono ?? "",
+          canal_preferido: contacto.canal_preferido,
+          categoria_contacto_base: contacto.categoria_contacto_base,
+          acepta_comunicados: contacto.acepta_comunicados ?? true,
+          activo: contacto.activo ?? true,
+        }
+      : {
+          cliente_id: defaultClienteId ?? "",
+          acepta_comunicados: true,
+          activo: true,
+          categoria_contacto_base: "familia",
+          canal_preferido: "whatsapp",
+        },
   })
 
   const onSubmit = async (data: FormData) => {
@@ -67,28 +73,45 @@ export function ContactoForm({ contacto, defaultClienteId, onSuccess }: Contacto
     <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Nombre completo <span className="text-red-500">*</span></label>
-          <input {...register("nombre_completo")} placeholder="Maria Garcia Lopez"
-            className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          {errors.nombre_completo && <p className="text-xs text-red-500 mt-1">{errors.nombre_completo.message}</p>}
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            Nombre completo <span className="text-red-500">*</span>
+          </label>
+          <input
+            {...register("nombre_completo")}
+            placeholder="Maria Garcia Lopez"
+            className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.nombre_completo && (
+            <p className="text-xs text-red-500 mt-1">{errors.nombre_completo.message}</p>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Centro educativo <span className="text-red-500">*</span></label>
-          <select {...register("cliente_id")}
-            className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            Centro educativo <span className="text-red-500">*</span>
+          </label>
+          <select
+            {...register("cliente_id")}
+            className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
             <option value="">Seleccionar centro...</option>
             {clientes.map((c: { cliente_id: string; nombre: string }) => (
-              <option key={c.cliente_id} value={c.cliente_id}>{c.nombre}</option>
+              <option key={c.cliente_id} value={c.cliente_id}>
+                {c.nombre}
+              </option>
             ))}
           </select>
-          {errors.cliente_id && <p className="text-xs text-red-500 mt-1">{errors.cliente_id.message}</p>}
+          {errors.cliente_id && (
+            <p className="text-xs text-red-500 mt-1">{errors.cliente_id.message}</p>
+          )}
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Categoria</label>
-          <select {...register("categoria_contacto_base")}
-            className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select
+            {...register("categoria_contacto_base")}
+            className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
             <option value="familia">Familia</option>
             <option value="tutor">Tutor</option>
             <option value="administrativo">Administrativo</option>
@@ -98,14 +121,19 @@ export function ContactoForm({ contacto, defaultClienteId, onSuccess }: Contacto
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Rol / Cargo</label>
-          <input {...register("rol")} placeholder="Director, Secretaria..."
-            className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input
+            {...register("rol")}
+            placeholder="Director, Secretaria..."
+            className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Canal preferido</label>
-          <select {...register("canal_preferido")}
-            className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select
+            {...register("canal_preferido")}
+            className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
             <option value="whatsapp">WhatsApp</option>
             <option value="email">Email</option>
             <option value="ambos">Ambos</option>
@@ -114,15 +142,20 @@ export function ContactoForm({ contacto, defaultClienteId, onSuccess }: Contacto
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-          <input {...register("email")} type="email"
-            className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input
+            {...register("email")}
+            type="email"
+            className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
           {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Telefono</label>
-          <input {...register("telefono")}
-            className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input
+            {...register("telefono")}
+            className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
 
         <div className="col-span-2 flex gap-4">
@@ -138,8 +171,11 @@ export function ContactoForm({ contacto, defaultClienteId, onSuccess }: Contacto
       </div>
 
       <div className="flex justify-end pt-2 border-t border-gray-100">
-        <button type="submit" disabled={isPending}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors disabled:opacity-60">
+        <button
+          type="submit"
+          disabled={isPending}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors disabled:opacity-60"
+        >
           {isPending && <Loader2 size={14} className="animate-spin" />}
           {isPending ? "Guardando..." : isEdit ? "Guardar cambios" : "Crear contacto"}
         </button>
