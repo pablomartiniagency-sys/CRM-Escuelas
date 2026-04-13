@@ -184,7 +184,7 @@ export function ComunicadosPage() {
   return (
     <div className="flex flex-col h-full space-y-5">
       {/* Top Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-zinc-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-zinc-900 tracking-tight">Comunicados</h1>
           <p className="text-[13px] text-zinc-500 mt-1">
@@ -232,16 +232,13 @@ export function ComunicadosPage() {
       {/* Stats summary */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "Total", value: comunicados.length, color: "border-l-4 border-blue-400" },
-          { label: "Borradores", value: borradores, color: "border-l-4 border-amber-400" },
-          { label: "Enviados", value: enviados, color: "border-l-4 border-emerald-400" },
-        ].map(({ label, value, color }) => (
-          <div
-            key={label}
-            className={`bg-white rounded-xl shadow-sm p-4 border border-gray-200 ${color}`}
-          >
-            <p className="text-xs text-gray-500 font-medium mb-0.5">{label}</p>
-            <p className="text-2xl font-bold text-gray-900">{value}</p>
+          { label: "Total", value: comunicados.length, bg: "bg-indigo-50 border border-indigo-100", numColor: "text-indigo-700", labelColor: "text-indigo-400" },
+          { label: "Borradores", value: borradores, bg: "bg-amber-50 border border-amber-100", numColor: "text-amber-700", labelColor: "text-amber-400" },
+          { label: "Enviados", value: enviados, bg: "bg-emerald-50 border border-emerald-100", numColor: "text-emerald-700", labelColor: "text-emerald-400" },
+        ].map(({ label, value, bg, numColor, labelColor }) => (
+          <div key={label} className={`${bg} rounded-2xl p-4`}>
+            <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${labelColor}`}>{label}</p>
+            <p className={`text-3xl font-black tracking-tight ${numColor}`}>{value}</p>
           </div>
         ))}
       </div>
