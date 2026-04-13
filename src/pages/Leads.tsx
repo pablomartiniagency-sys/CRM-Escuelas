@@ -134,7 +134,7 @@ export function LeadsPage() {
   return (
     <div className="flex flex-col h-full space-y-5">
       {/* Top Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-zinc-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-zinc-900 tracking-tight">Leads</h1>
           <p className="text-[13px] text-zinc-500 mt-1">{leads.length} leads registrados</p>
@@ -164,47 +164,50 @@ export function LeadsPage() {
       </div>
 
       {/* Pipeline cards */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           {
             label: "Nuevos",
             key: "new",
-            color: "border-l-4 border-blue-400",
-            badge: "bg-blue-50 text-blue-700",
+            bg: "bg-indigo-50 border border-indigo-100",
+            numColor: "text-indigo-700",
+            labelColor: "text-indigo-500",
+            ring: "ring-2 ring-indigo-300",
           },
           {
             label: "Contactados",
             key: "contacted",
-            color: "border-l-4 border-amber-400",
-            badge: "bg-amber-50 text-amber-700",
+            bg: "bg-amber-50 border border-amber-100",
+            numColor: "text-amber-700",
+            labelColor: "text-amber-500",
+            ring: "ring-2 ring-amber-300",
           },
           {
             label: "Cualificados",
             key: "qualified",
-            color: "border-l-4 border-violet-400",
-            badge: "bg-violet-50 text-violet-700",
+            bg: "bg-violet-50 border border-violet-100",
+            numColor: "text-violet-700",
+            labelColor: "text-violet-500",
+            ring: "ring-2 ring-violet-300",
           },
           {
             label: "Descartados",
             key: "discarded",
-            color: "border-l-4 border-gray-300",
-            badge: "bg-gray-50 text-gray-500",
+            bg: "bg-gray-100 border border-gray-200",
+            numColor: "text-gray-500",
+            labelColor: "text-gray-400",
+            ring: "ring-2 ring-gray-300",
           },
-        ].map(({ label, key, color, badge }) => (
+        ].map(({ label, key, bg, numColor, labelColor, ring }) => (
           <button
             key={key}
             onClick={() => setStatusFilter(statusFilter === key ? "all" : key)}
-            className={`bg-white rounded-xl shadow-sm p-4 text-left hover:shadow-md transition-all ${color} ${statusFilter === key ? "ring-2 ring-offset-1 ring-blue-400" : ""}`}
+            className={`${bg} rounded-2xl p-4 text-left transition-all hover:shadow-md ${statusFilter === key ? ring : ""}`}
           >
-            <p className="text-xs font-medium text-gray-500 mb-1">{label}</p>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${labelColor}`}>{label}</p>
+            <p className={`text-3xl font-black tracking-tight ${numColor}`}>
               {byStatus[key as keyof typeof byStatus]}
             </p>
-            {statusFilter === key && (
-              <span className={`inline-block text-xs px-1.5 py-0.5 rounded mt-1 ${badge}`}>
-                Filtrado
-              </span>
-            )}
           </button>
         ))}
       </div>

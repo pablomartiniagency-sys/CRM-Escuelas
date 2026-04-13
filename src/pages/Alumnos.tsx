@@ -113,7 +113,7 @@ export function AlumnosPage() {
   return (
     <div className="flex flex-col h-full space-y-5">
       {/* Top Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-zinc-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-zinc-900 tracking-tight">Alumnos</h1>
           <p className="text-[13px] text-zinc-500 mt-1">

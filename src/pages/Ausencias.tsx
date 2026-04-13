@@ -159,7 +159,7 @@ export function AusenciasPage() {
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-3.5 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-3.5 py-2 rounded-lg transition-colors shadow-sm shadow-indigo-600/20"
         >
           <Plus size={15} />
           Registrar ausencia
@@ -169,44 +169,13 @@ export function AusenciasPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          {
-            label: "Hoy",
-            value: hoy,
-            icon: Calendar,
-            alert: hoy > 0,
-            color: "border-l-4 border-red-400",
-          },
-          {
-            label: "Esta semana",
-            value: estaSemana,
-            icon: Calendar,
-            alert: false,
-            color: "border-l-4 border-amber-400",
-          },
-          {
-            label: "Sin justificar",
-            value: sinJustificar,
-            icon: AlertTriangle,
-            alert: sinJustificar > 0,
-            color: "border-l-4 border-orange-400",
-          },
-        ].map(({ label, value, icon: Icon, alert, color }) => (
-          <div
-            key={label}
-            className={`bg-white rounded-xl shadow-sm p-4 border border-gray-200 ${color}`}
-          >
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-xs text-gray-500 font-medium">{label}</p>
-              <Icon
-                size={14}
-                className={alert && value > 0 ? "text-orange-400" : "text-gray-300"}
-              />
-            </div>
-            <p
-              className={`text-2xl font-bold ${alert && value > 0 ? "text-orange-600" : "text-gray-900"}`}
-            >
-              {value}
-            </p>
+          { label: "Hoy", value: hoy, bg: "bg-rose-50 border border-rose-100", numColor: "text-rose-700", labelColor: "text-rose-400" },
+          { label: "Esta semana", value: estaSemana, bg: "bg-amber-50 border border-amber-100", numColor: "text-amber-700", labelColor: "text-amber-400" },
+          { label: "Sin justificar", value: sinJustificar, bg: "bg-orange-50 border border-orange-100", numColor: "text-orange-700", labelColor: "text-orange-400" },
+        ].map(({ label, value, bg, numColor, labelColor }) => (
+          <div key={label} className={`${bg} rounded-2xl p-4`}>
+            <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${labelColor}`}>{label}</p>
+            <p className={`text-3xl font-black tracking-tight ${numColor}`}>{value}</p>
           </div>
         ))}
       </div>
