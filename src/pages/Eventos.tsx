@@ -6,6 +6,7 @@ import { useEventos, useCreateEvento } from "@/hooks/queries/useEventos"
 import { useClientes } from "@/hooks/queries/useClientes"
 import { SlidePanel } from "@/components/panels/SlidePanel"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button"
 import { Calendar, Plus, Building2, Clock, Loader2, ChevronLeft, ChevronRight } from "lucide-react"
 import {
   format,
@@ -94,34 +95,34 @@ export function EventosPage() {
   const proximos = eventos.filter((e) => isFuture(parseISO(e.fecha_inicio))).length
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col h-full space-y-5">
+      {/* Top Action Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-zinc-200 shadow-sm">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Eventos</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            {eventos.length} eventos · {proximos} proximos
+          <h1 className="text-xl font-bold text-zinc-900 tracking-tight">Eventos</h1>
+          <p className="text-[13px] text-zinc-500 mt-1">
+            {eventos.length} eventos registrados · {proximos} próximos
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        
+        <div className="flex flex-wrap items-center gap-3">
           {/* Toggle view */}
-          <div className="flex items-center bg-gray-100 rounded-lg p-0.5 gap-0.5">
+          <div className="flex items-center p-1 bg-zinc-100/80 rounded-md border border-zinc-200/60 font-medium">
             {(["lista", "calendario"] as const).map((v) => (
               <button
                 key={v}
                 onClick={() => setViewMode(v)}
-                className={`text-xs px-3 py-1.5 rounded-md capitalize transition-colors ${viewMode === v ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                className={`px-3.5 py-1.5 text-[12px] rounded transition-all capitalize ${viewMode === v ? "bg-white text-zinc-900 shadow-sm border border-zinc-200/50" : "text-zinc-500 hover:text-zinc-900 border border-transparent"}`}
               >
                 {v}
               </button>
             ))}
           </div>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-3.5 py-2 rounded-lg transition-colors"
-          >
-            <Plus size={15} />
+          
+          <Button onClick={() => setShowCreate(true)} size="sm" className="h-9 ml-1">
+            <Plus size={15} className="mr-1.5" />
             Nuevo evento
-          </button>
+          </Button>
         </div>
       </div>
 

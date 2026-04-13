@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import {
   useReactTable,
   getCoreRowModel,
@@ -14,6 +14,10 @@ import { AlumnoForm } from "@/components/forms/AlumnoForm"
 import { useAlumnos } from "@/hooks/queries/useAlumnos"
 import { GraduationCap, Search, AlertTriangle, Plus } from "lucide-react"
 import { differenceInYears, parseISO } from "date-fns"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { cn } from "@/lib/utils"
 import type { Alumno } from "@/types/database"
 
 const col = createColumnHelper<Alumno & { clientes?: { nombre: string } }>()
@@ -86,7 +90,7 @@ export function AlumnosPage() {
           const v = info.getValue()
           if (!v) return <span className="text-gray-300">-</span>
           const age = differenceInYears(new Date(), parseISO(v))
-          return <span className="text-sm text-gray-600">{age} anos</span>
+          return <span className="text-sm text-gray-600">{age} años</span>
         },
       }),
       col.accessor("activo", {
@@ -107,60 +111,58 @@ export function AlumnosPage() {
   const conAlergias = alumnos.filter((a) => a.alergias).length
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col h-full space-y-5">
+      {/* Top Action Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-zinc-200 shadow-sm">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Alumnos</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <h1 className="text-xl font-bold text-zinc-900 tracking-tight">Alumnos</h1>
+          <p className="text-[13px] text-zinc-500 mt-1">
             {alumnos.length} alumnos
             {conAlergias > 0 && (
               <span className="ml-2 text-orange-500 font-medium">· {conAlergias} con alergias</span>
             )}
           </p>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-3.5 py-2 rounded-lg transition-colors"
-        >
-          <Plus size={15} />
-          Nuevo alumno
-        </button>
-      </div>
+        
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 z-10" />
+            <Input
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder="Buscar alumnos..."
+              className="pl-9 h-9 w-[250px] bg-zinc-50/50"
+            />
+          </div>
+          
+          <Tabs value={activeFilter} onValueChange={(v) => setActiveFilter(v)} className="w-[240px]">
+            <TabsList className="h-9 w-full grid grid-cols-3">
+              <TabsTrigger value="all" className="text-xs">Todos</TabsTrigger>
+              <TabsTrigger value="active" className="text-xs">Activos</TabsTrigger>
+              <TabsTrigger value="inactive" className="text-xs">Inactivos</TabsTrigger>
+            </TabsList>
+          </Tabs>
 
-      <div className="flex items-center gap-3">
-        <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Buscar alumnos..."
-            className="pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-56"
-          />
+          <Button onClick={() => setShowCreate(true)} size="sm" className="h-9">
+            <Plus size={15} className="mr-1.5" />
+            Nuevo alumno
+          </Button>
         </div>
-        <select
-          value={activeFilter}
-          onChange={(e) => setActiveFilter(e.target.value)}
-          className="text-sm border border-gray-200 rounded-lg px-3 py-2"
-        >
-          <option value="all">Todos</option>
-          <option value="active">Activos</option>
-          <option value="inactive">Inactivos</option>
-        </select>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+      <div className="bg-white rounded-xl border border-border shadow-sm">
         {isLoading ? (
           <TableSkeleton />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
+            <table className="w-full text-[13px] border-collapse">
+              <thead className="bg-zinc-50/80 border-b border-border">
                 {table.getHeaderGroups().map((hg) => (
-                  <tr key={hg.id} className="border-b border-gray-100 bg-gray-50/50">
+                  <tr key={hg.id}>
                     {hg.headers.map((h) => (
                       <th
                         key={h.id}
-                        className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3"
+                        className="text-left font-medium text-zinc-500 uppercase tracking-wider px-4 py-2.5 whitespace-nowrap"
                       >
                         {flexRender(h.column.columnDef.header, h.getContext())}
                       </th>
@@ -183,10 +185,10 @@ export function AlumnosPage() {
                     <tr
                       key={row.id}
                       onClick={() => setSelectedId(row.original.alumno_id)}
-                      className="border-b border-gray-50 hover:bg-blue-50/40 transition-colors cursor-pointer"
+                      className="border-b border-border hover:bg-zinc-50 transition-colors cursor-pointer group"
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className="px-4 py-3">
+                        <td key={cell.id} className="px-4 py-2.5 text-zinc-700 whitespace-nowrap">
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </td>
                       ))}

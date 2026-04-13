@@ -35,7 +35,9 @@ function KpiCard({ label, value, icon: Icon, color, loading, alert, href }: KpiC
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`bg-white rounded-xl border p-5 flex items-start gap-4 cursor-pointer hover:shadow-md hover:border-gray-300 transition-all ${alert && Number(value) > 0 ? "border-orange-200 bg-orange-50/10" : "border-gray-200"}`}
+      whileHover={{ y: -4, scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className={`bg-white rounded-2xl border p-5 flex items-start gap-4 cursor-pointer hover:shadow-xl transition-shadow ${alert && Number(value) > 0 ? "border-orange-200 bg-orange-50/10" : "border-gray-100"}`}
       onClick={() => href && navigate(href)}
     >
       <div className={`p-3 rounded-xl ${color}`}>
@@ -169,17 +171,17 @@ export function DashboardPage() {
             Aquí tienes el resumen para hoy, {format(new Date(), "EEEE d 'de' MMMM", { locale: es })}
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="grid grid-cols-1 xs:grid-cols-2 w-full sm:w-auto sm:flex sm:flex-wrap gap-3">
           <button
             onClick={() => navigate("/actividades")}
-            className="flex items-center gap-2 text-sm font-semibold bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
+            className="flex items-center justify-center gap-2 text-sm font-semibold bg-white border border-gray-200 text-gray-700 w-full sm:w-auto px-4 py-2 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
           >
             <Clock size={16} className="text-gray-400" />
             Añadir Actividad
           </button>
           <button
             onClick={() => navigate("/clientes")}
-            className="flex items-center gap-2 text-sm font-semibold bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all shadow-sm shadow-blue-600/20"
+            className="flex items-center justify-center gap-2 text-sm font-semibold bg-blue-600 text-white w-full sm:w-auto px-4 py-2 rounded-xl hover:bg-blue-700 transition-all shadow-sm shadow-blue-600/20"
           >
             <Plus size={16} />
             Nuevo Cliente
@@ -238,7 +240,7 @@ export function DashboardPage() {
                   {tareasPendientes.map((act: TareaRow) => (
                     <div
                       key={act.actividad_id}
-                      className="group flex items-start gap-4 px-6 py-4 hover:bg-white transition-all cursor-pointer"
+                      className="group flex items-start gap-4 px-6 py-4 hover:bg-blue-50/40 transition-colors cursor-pointer"
                     >
                       <button className="mt-1 flex-shrink-0 w-5 h-5 rounded-md border-2 border-gray-300 group-hover:border-blue-500 transition-colors flex items-center justify-center">
                         {/* Fake checkbox */}

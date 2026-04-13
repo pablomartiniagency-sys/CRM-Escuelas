@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import {
   useReactTable,
   getCoreRowModel,
@@ -24,6 +24,8 @@ import {
 } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import type { Comunicado } from "@/types/database"
 
 const col = createColumnHelper<Comunicado>()
@@ -180,11 +182,12 @@ export function ComunicadosPage() {
   const enviados = comunicados.filter((c) => c.enviado).length
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col h-full space-y-5">
+      {/* Top Action Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-zinc-200 shadow-sm">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Comunicados</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <h1 className="text-xl font-bold text-zinc-900 tracking-tight">Comunicados</h1>
+          <p className="text-[13px] text-zinc-500 mt-1">
             {comunicados.length} comunicados
             {borradores > 0 && (
               <span className="ml-2 text-amber-500 font-medium">· {borradores} borradores</span>
@@ -194,13 +197,36 @@ export function ComunicadosPage() {
             )}
           </p>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-3.5 py-2 rounded-lg transition-colors"
-        >
-          <Plus size={15} />
-          Nuevo comunicado
-        </button>
+        
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 z-10" />
+            <Input
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder="Buscar comunicados..."
+              className="pl-9 h-9 w-[240px] bg-zinc-50/50"
+            />
+          </div>
+          
+          <select
+            value={tipoFilter}
+            onChange={(e) => setTipoFilter(e.target.value)}
+            className="h-9 px-3 text-[13px] border border-zinc-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary bg-zinc-50/50 hover:bg-white transition-colors"
+          >
+            <option value="all">Todos los tipos</option>
+            {["Circular", "Aviso", "Recordatorio", "Evento", "Urgente", "Otro"].map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+
+          <Button onClick={() => setShowCreate(true)} size="sm" className="h-9 ml-1">
+            <Plus size={15} className="mr-1.5" />
+            Nuevo comunicado
+          </Button>
+        </div>
       </div>
 
       {/* Stats summary */}
@@ -218,30 +244,6 @@ export function ComunicadosPage() {
             <p className="text-2xl font-bold text-gray-900">{value}</p>
           </div>
         ))}
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Buscar comunicados..."
-            className="pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-56"
-          />
-        </div>
-        <select
-          value={tipoFilter}
-          onChange={(e) => setTipoFilter(e.target.value)}
-          className="text-sm border border-gray-200 rounded-lg px-3 py-2"
-        >
-          <option value="all">Todos los tipos</option>
-          {["Circular", "Aviso", "Recordatorio", "Evento", "Urgente", "Otro"].map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">

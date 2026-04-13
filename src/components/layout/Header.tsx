@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
 import { useAuth } from "@/hooks/useAuth"
@@ -79,9 +79,10 @@ const TYPE_COLORS: Record<string, string> = {
 
 interface HeaderProps {
   onMenuClick?: () => void
+  sidebarCollapsed?: boolean
 }
 
-export function Header({ onMenuClick }: HeaderProps) {
+export function Header({ onMenuClick, sidebarCollapsed }: HeaderProps) {
   const [query, setQuery] = useState("")
   const [showResults, setShowResults] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
@@ -117,7 +118,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   const userName = user?.email?.split("@")[0] ?? "Usuario"
 
   return (
-    <header className="fixed top-0 right-0 left-0 lg:left-[240px] h-[60px] bg-white/95 backdrop-blur-sm border-b border-gray-200 z-20 flex items-center px-4 sm:px-5 gap-3">
+    <header className="sticky top-0 h-[60px] flex-shrink-0 bg-white/95 backdrop-blur-sm border-b border-border z-20 flex items-center px-4 sm:px-5 gap-3 w-full">
       {/* Hamburger for mobile */}
       <button
         onClick={onMenuClick}
@@ -230,7 +231,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                 className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
               >
                 <LogOut size={15} />
-                Cerrar sesion
+                Cerrar sesión
               </button>
             </div>
           </div>

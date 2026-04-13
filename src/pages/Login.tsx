@@ -33,8 +33,8 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-center py-12 px-6 sm:px-6 lg:px-8 font-sans">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+    <div className="min-h-[100dvh] bg-[#F8FAFC] flex flex-col items-center justify-center py-12 px-6 sm:px-6 lg:px-8 font-sans">
+      <div className="w-full sm:mx-auto sm:max-w-md">
         <div className="flex justify-center">
           <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
             <GraduationCap className="text-white w-8 h-8" />
@@ -171,8 +171,8 @@ export function LoginPage() {
       </div>
       
       {/* Footer minimal */}
-      <div className="mt-auto pt-16 text-center">
-        <p className="text-sm text-gray-400">
+      <div className="mt-14 pt-16 text-center w-full">
+        <p className="text-sm text-gray-500">
           © {new Date().getFullYear()} CRM Escuelas. Desarrollado para instituciones educativas.
         </p>
       </div>

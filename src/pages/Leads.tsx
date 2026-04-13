@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import {
   useReactTable,
   getCoreRowModel,
@@ -13,6 +13,8 @@ import { useLeads } from "@/hooks/queries/useLeads"
 import { Target, Search, Mail, MessageCircle, Phone, Globe } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import type { Lead } from "@/types/database"
 
 const col = createColumnHelper<Lead>()
@@ -130,11 +132,34 @@ export function LeadsPage() {
   }, [leads])
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col h-full space-y-5">
+      {/* Top Action Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-zinc-200 shadow-sm">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Leads</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{leads.length} leads en total</p>
+          <h1 className="text-xl font-bold text-zinc-900 tracking-tight">Leads</h1>
+          <p className="text-[13px] text-zinc-500 mt-1">{leads.length} leads registrados</p>
+        </div>
+        
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 z-10" />
+            <Input
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder="Buscar leads..."
+              className="pl-9 h-9 w-[280px] bg-zinc-50/50"
+            />
+          </div>
+          {statusFilter !== "all" && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setStatusFilter("all")}
+              className="text-[13px] h-9"
+            >
+              Limpiar filtro
+            </Button>
+          )}
         </div>
       </div>
 
@@ -184,25 +209,7 @@ export function LeadsPage() {
         ))}
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Buscar leads..."
-            className="pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-56"
-          />
-        </div>
-        {statusFilter !== "all" && (
-          <button
-            onClick={() => setStatusFilter("all")}
-            className="text-xs text-gray-500 hover:text-gray-700 underline"
-          >
-            Limpiar filtro
-          </button>
-        )}
-      </div>
+      {/* Pipeline cards ends here, search is moved up */}
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
         {isLoading ? (
@@ -210,13 +217,13 @@ export function LeadsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead>
+              <thead className="bg-zinc-50/80 border-b border-border">
                 {table.getHeaderGroups().map((hg) => (
-                  <tr key={hg.id} className="border-b border-gray-100 bg-gray-50/50">
+                  <tr key={hg.id}>
                     {hg.headers.map((h) => (
                       <th
                         key={h.id}
-                        className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3"
+                        className="text-left font-medium text-zinc-500 uppercase tracking-wider px-4 py-2.5 whitespace-nowrap text-[13px]"
                       >
                         {flexRender(h.column.columnDef.header, h.getContext())}
                       </th>
@@ -239,7 +246,7 @@ export function LeadsPage() {
                     <tr
                       key={row.id}
                       onClick={() => setSelectedLead(row.original)}
-                      className="border-b border-gray-50 hover:bg-blue-50/40 transition-colors cursor-pointer"
+                      className="border-b border-border hover:bg-zinc-50 transition-colors cursor-pointer group"
                     >
                       {row.getVisibleCells().map((cell) => (
                         <td key={cell.id} className="px-4 py-3">

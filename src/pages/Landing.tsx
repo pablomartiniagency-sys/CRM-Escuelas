@@ -79,7 +79,7 @@ export function LandingPage() {
               CRM diseñado para instituciones educativas
             </div>
 
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-gray-900 tracking-tight leading-[1.1]">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-gray-900 tracking-tight leading-snug">
               El control de tus colegios, <br className="hidden sm:block" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">
                 centralizado y simple.
@@ -133,12 +133,13 @@ export function LandingPage() {
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
+                    whileHover={{ scale: 1.02, y: -5 }}
                     viewport={{ once: true }}
-                    transition={{ delay: index * 0.1, duration: 0.5 }}
-                    className="p-6 rounded-2xl bg-gray-50 border border-gray-100 hover:border-blue-100 hover:bg-blue-50/50 transition-colors"
+                    transition={{ delay: index * 0.1, duration: 0.5, type: "spring", stiffness: 100 }}
+                    className="p-8 rounded-3xl bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300 relative overflow-hidden group"
                   >
-                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-6 border border-gray-100">
-                      <Icon className="w-6 h-6 text-blue-600" />
+                    <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-sm mb-6 border border-gray-100">
+                      <Icon className="w-7 h-7 text-blue-600" />
                     </div>
                     <h3 className="text-lg font-bold text-gray-900 mb-2">
                       {benefit.title}
